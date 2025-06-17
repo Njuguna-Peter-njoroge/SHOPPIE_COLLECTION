@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String  @db.VarChar(200)
+  email     String @unique @db.VarChar(200)
+  password  String @db.VarChar(200)
+  role      UserRole @default(CUSTOMER)
+  createdAt DateTime @default(now()) 
+  updatedAt DateTime @default(now()) 
+
+  cartItem cartItem[]
+}
+
+model Product {
+  id String @id @default(cuid())
+  name String
+  description String
+  price String
+  imageUrl String
+  stock Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  addToCartItems cartItem[]
+}
+// model UserRole {
+// id String
+// name String
+// email String
+// password String
+// role UserRole @default(CUSTOMER)
+// }
+
+model cartItem {
+  id String @id @default(cuid())
+  quantity Int
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId],references: [id])
+  productId String
+  createdAt DateTime @default(now())
+   
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}

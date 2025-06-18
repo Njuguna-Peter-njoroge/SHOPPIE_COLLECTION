@@ -1,0 +1,13 @@
+### create user 
+
+POST http://localhost:3000/users
+Content-Type: application/json
+
+
+      {
+  "name": "AlexNjenga",
+  "email": "alexsam@gmail.com",
+  "password": "StrongPass123",
+  "role": "CUSTOMER"
+}
+

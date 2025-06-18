@@ -46,7 +46,7 @@ model Product {
 // }
 
 model cartItem {
-  id String @id @default(cuid())
+  id String @id @default(cuid())  //@unique to be added
   quantity Int
   userId String
   user User @relation(fields: [userId], references: [id])

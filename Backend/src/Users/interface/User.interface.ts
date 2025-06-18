@@ -1,4 +1,4 @@
-import { UserRole } from 'generated/prisma';
+import { UserRole, UserStatus } from 'generated/prisma';
 
 export interface Users {
   name: string;
@@ -8,6 +8,7 @@ export interface Users {
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
+  status: UserStatus;
 }
 
 export interface UserResponse {
@@ -16,4 +17,5 @@ export interface UserResponse {
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
+  status: UserStatus;
 }

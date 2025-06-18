@@ -1,3 +1,4 @@
+import { UserStatus } from './../../../generated/prisma/index.d';
 import { UserRole } from 'generated/prisma';
 
 export class UserResponseDto {
@@ -7,4 +8,5 @@ export class UserResponseDto {
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
+  status: UserStatus;
 }

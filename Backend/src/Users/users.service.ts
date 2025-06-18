@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+// import { UserResponse } from './../../dist/Users/interface/User.interface.d';
 // import { PrismaClient } from 'generated/prisma/client';
 import { CreateUserDto } from './Dtos/createUserDto';
 import { BadRequestException, Body, Injectable } from '@nestjs/common';
@@ -9,6 +11,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ApiResponse } from 'src/Shared/Api-interface/ap-response.interface';
 import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 import * as bcrypt from 'bcrypt';
+
+// interface PaginationOptions {
+//   page?: number;
+//   limit?: number;
+// }
 
 @Injectable()
 export class UsersService {
@@ -39,6 +46,7 @@ export class UsersService {
         role: 'CUSTOMER',
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
+        status: data.status ?? 'ACTIVE',
       };
       return {
         success: true,
@@ -56,4 +64,17 @@ export class UsersService {
       }
     }
   }
+
+  // async findAll(
+  //   options:PaginationOptions = {}
+  // ):<ApiResponse<UserResponseDto>>{
+  //   const {page = 1, limit = 10} = Options;
+  //   const skip = (page - 1) * limit;
+
+  //   const [users,total] = await Promise.all({
+  //     this.prisma.Users.findMany({
+  //       where:
+  //     })
+  //   })
+  // }
 }

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { join } from 'node:path';
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Transform } from 'class-transformer';
@@ -8,8 +11,9 @@ import {
   MaxLength,
   IsEmail,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
-import { UserRole } from 'generated/prisma';
+import { UserRole, UserStatus } from 'generated/prisma';
 import 'reflect-metadata';
 
 export class CreateUserDto {
@@ -33,4 +37,10 @@ export class CreateUserDto {
     message: `Role must be one of: ${Object.values(UserRole).join(', ')}`,
   })
   role?: UserRole;
+
+  @IsOptional()
+  @IsEnum(UserStatus, {
+    message: `Status must be one of: ${Object.values(UserStatus).join(', ')}`,
+  })
+  status: UserStatus;
 }

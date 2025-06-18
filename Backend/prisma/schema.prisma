@@ -22,6 +22,8 @@ model User {
   role      UserRole @default(CUSTOMER)
   createdAt DateTime @default(now()) 
   updatedAt DateTime @default(now()) 
+    status    UserStatus @default(ACTIVE)
+ isActive  Boolean @default(true)
 
   cartItem cartItem[]
 }
@@ -59,4 +61,9 @@ model cartItem {
 enum UserRole {
   ADMIN
   CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
 }

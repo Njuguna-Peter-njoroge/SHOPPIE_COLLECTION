@@ -1,3 +1,3 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-//# sourceMappingURL=ap-response.interface.js.map
+//# sourceMappingURL=product.interface.js.map

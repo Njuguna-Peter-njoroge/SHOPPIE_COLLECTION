@@ -1,0 +1,11 @@
+### create product
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+ "name": "keyboard",
+ "description": "wireless keyboard",
+  "price": "23454.00",
+  "stock": 12,
+  "imageUrl": "https://unsplash.com/photos/a-woman-runs-through-a-shadow-shaped-doorway-if0cWm_Y3jY"
+}

@@ -1,5 +1,5 @@
 import { updateUserDto } from './Dtos/updateUserDto';
-import { ApiResponse } from 'src/Shared/Api-interface/ap-response.interface';
+import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
 import { CreateUserDto } from './Dtos/createUserDto';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './Dtos/userResponse.Dto';

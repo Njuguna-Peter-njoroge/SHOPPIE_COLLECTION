@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { UserResponseDto } from './Dtos/userResponse.Dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ApiResponse } from 'src/Shared/Api-interface/ap-response.interface';
+import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
 import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 import * as bcrypt from 'bcryptjs';
 import { Prisma, UserRole, type User } from 'generated/prisma';

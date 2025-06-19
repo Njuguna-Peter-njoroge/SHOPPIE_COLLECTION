@@ -1,7 +1,7 @@
 import { CreateUserDto } from './Dtos/createUserDto';
 import { UserResponseDto } from './Dtos/userResponse.Dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ApiResponse } from 'src/Shared/Api-interface/ap-response.interface';
+import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
 import { updateUserDto } from './Dtos/updateUserDto';
 interface PaginationOptions {
     page?: number;

@@ -1,3 +1,4 @@
+// import { Product, ProductStatus } from './../../generated/prisma/index.d';
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createProductDto } from './Dtos/createproduct.dto';
 import { UserRole } from 'generated/prisma';
@@ -14,7 +15,7 @@ import {
   Decimal,
   PrismaClientKnownRequestError,
 } from 'generated/prisma/runtime/library';
-import { ProductListResponse } from './interfaces/product.interface';
+// import { ProductListResponse } from './interfaces/product.interface';
 
 @Injectable()
 export class ProductsService {
@@ -72,25 +73,25 @@ export class ProductsService {
     }
   }
 
-  async findAll(
-    options: PaginationOptions = {},
-  ): Promise<ApiResponse<ProductListResponse[]>> {
-    const { page = 1, limit = 10 } = options;
-    const skip = (page - 1) * limit;
+  //   async findAll(
+  //     options: PaginationOptions = {},
+  //   ): Promise<ApiResponse<ProductListResponse[]>> {
+  //     const { page = 1, limit = 10 } = options;
+  //     const skip = (page - 1) * limit;
 
-    const [users] = await Promise.all([
-      this.Prisma.user.findMany({
-        where: { isActive: true },
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.Prisma.user.count({ where: { isActive: true } }),
-    ]);
-    return {
-      success: true,
-      message: 'Users retrieved successfully',
-      data: users.map((user) => this.sanitizeUser(user)),
-    };
-  }
+  //     const [Product] = await Promise.all([
+  //       this.Prisma.user.findMany({
+  //         where: { isActive: true },
+  //         skip,
+  //         take: limit,
+  //         orderBy: { createdAt: 'desc' },
+  //       }),
+  //       this.Prisma.user.count({ where: { ProductStatus === AVAILABLE } }),
+  //     ]);
+  //     return {
+  //       success: true,
+  //       message: 'Users retrieved successfully',
+  //       data: products.map((Product) => this.sanitizeproduct(Product)),
+  //     };
+  //   }
 }

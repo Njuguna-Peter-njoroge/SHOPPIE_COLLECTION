@@ -5,9 +5,38 @@ Content-Type: application/json
 
 
       {
-  "name": "AlexNjenga",
-  "email": "alexsam@gmail.com",
+  "name": "Alexjunior",
+  "email": "alexm@gmail.com",
   "password": "StrongPass123",
   "role": "CUSTOMER"
 }
 
+#### GET ALL USERS
+
+GET http://localhost:3000/users
+Content-Type: application/json
+
+#### GET ONE USER BY ID
+
+GET http://localhost:3000/users/cmc2z4lqr0001mnhw2lby1dq8
+Content-Type: application/json
+
+### get user by email
+GET http://localhost:3000/users/email/alexpaul@gmail.com
+Content-Type: application/json
+
+
+### update user by id
+
+PATCH  http://localhost:3000/users/cmc2fsl9z0000mnqo5ko4mv0g
+Content-Type: application/json
+
+{
+  "name" :"john",
+  "email" :"johnpaul@gmail.com",
+
+}
+
+### delete by id
+DELETE http://localhost:3000/users/cmc2fsl9z0000mnqo5ko4mv0g
+Content-Type: application/json

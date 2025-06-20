@@ -67,6 +67,27 @@ let ProductsService = class ProductsService {
             }
         }
     }
+    async findAll() {
+        try {
+            return await this.Prisma.product.findMany();
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                throw new common_1.BadRequestException(error.message);
+            }
+            throw new common_1.BadRequestException('Failed to fetch products');
+        }
+    }
+    findOne(id) {
+        if (!id) {
+            throw new common_1.BadRequestException('product id is required');
+        }
+        return {
+            success: true,
+            message: 'User retrieved successfully',
+            data, this: .Prisma
+        };
+    }
 };
 exports.ProductsService = ProductsService;
 exports.ProductsService = ProductsService = __decorate([

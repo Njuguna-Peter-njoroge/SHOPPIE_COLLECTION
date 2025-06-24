@@ -1,0 +1,145 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.logo h1 {
+  font-size: 32px;
+  color: #2563eb;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a, .nav-links .signup {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nav-links .signup {
+  padding: 8px 16px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.nav-links .signup:hover {
+  background-color: #1e4fd8;
+}
+
+.welcome-heading {
+  text-align: center;
+  color: #1e293b;
+  font-size: 24px;
+  line-height: 1.6;
+  margin-top: 60px;
+  margin-bottom: 40px;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  background-color: #f0f0f0;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  width: 100%;
+  padding-top: 40px;
+  max-width: 1000px;
+}
+
+.card-info {
+  background: #475569;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px auto;
+  width: fit-content;
+  background-color: pink;
+  border: none;
+  padding: 20px 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.button button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: black;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  z-index: 1;
+  position: relative;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  background-color: orangered;
+  height: 0;
+  width: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  transition: width 0.5s ease, height 0.5s;
+  z-index: 0;
+}
+
+.button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.button:hover button {
+  color: white;
+}
+
+.home-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}

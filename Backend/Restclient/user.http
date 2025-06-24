@@ -1,0 +1,42 @@
+### create user 
+
+POST http://localhost:3000/users
+Content-Type: application/json
+
+
+      {
+  "name": "cecilia",
+  "email": "cecilia@gmail.com",
+  "password": "StrongPass123",
+  "role": "CUSTOMER"
+}
+#### GET ALL USERS
+
+GET http://localhost:3000/users
+Content-Type: application/json
+
+#### GET ONE USER BY ID
+
+GET http://localhost:3000/users/cmc786gy10000g94ts16haw5e
+Content-Type: application/json
+
+
+### get user by email
+GET http://localhost:3000/users/email/peter@gmail.com
+Content-Type: application/json
+
+
+### update user by id
+
+PATCH  http://localhost:3000/users/cmc786gy10000g94ts16haw5e
+Content-Type: application/json
+
+{
+  "name" :"john",
+  "email" :"tred@gmail.com"
+
+}
+
+### delete by id
+DELETE http://localhost:3000/users/cmc786gy10000g94ts16haw5e
+Content-Type: application/json

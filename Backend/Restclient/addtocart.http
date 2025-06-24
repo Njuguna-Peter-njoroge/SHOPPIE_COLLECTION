@@ -1,0 +1,11 @@
+### Get items in cart
+GET http://localhost:3000/cart/cmc4fis2d0002g98t3g77jval
+
+### Add product to cart
+POST http://localhost:3000/cart/cmc4fis2d0002g98t3g77jval/add
+Content-Type: application/json
+
+{
+  "productId": "cmc6a900r0000g94t8bev6tsk",
+  "quantity": 1
+}

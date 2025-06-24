@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @id @default(cuid())
+  name  String @db.VarChar(200)
+  email String @unique @db.VarChar(200)
+
+  password  String     @db.VarChar(200)
+  role      UserRole   @default(CUSTOMER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+  status    UserStatus @default(ACTIVE)
+  isActive  Boolean    @default(true)
+
+  cartItems CartItem[]
+  carts     Cart[]
+}
+
+model Product {
+  id             String        @id @default(cuid())
+  name           String
+  description    String
+  price          Decimal       @db.Decimal(10, 2)
+  imageUrl       String
+  stock          Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now())
+  status         ProductStatus @default(AVAILABLE)
+  addToCartItems CartItem[]
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  items      CartItem[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  totalPrice String
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  quantity  Int
+  userId    String
+  cartId    String
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  createdAt DateTime @default(now())
+  cart      Cart     @relation(fields: [cartId], references: [id])
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum ProductStatus {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}

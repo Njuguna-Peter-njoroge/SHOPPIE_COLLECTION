@@ -63,7 +63,7 @@ let ProductsService = class ProductsService {
                 }
             }
             {
-                throw new common_1.BadRequestException('failed to create User');
+                throw new common_1.BadRequestException('failed to create product');
             }
         }
     }

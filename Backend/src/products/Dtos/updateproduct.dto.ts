@@ -20,7 +20,7 @@ export class updateProductDto {
   @IsOptional()
   @IsString({ message: 'email be a string' })
   @MinLength(8, { message: 'email must be at least 8 characters long' })
-  @MaxLength(20, { message: 'email must npot exeed 20 characters' })
+  @MaxLength(20, { message: 'email must not exceed 20 characters' })
   @IsEmail({}, { message: 'please provide a valid email' })
   email: string;
 

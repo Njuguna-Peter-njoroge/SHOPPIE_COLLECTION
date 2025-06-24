@@ -69,7 +69,7 @@ export class ProductsService {
         }
       }
       {
-        throw new BadRequestException('failed to create User');
+        throw new BadRequestException('failed to create product');
       }
     }
   }

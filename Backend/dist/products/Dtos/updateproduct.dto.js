@@ -31,7 +31,7 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)({ message: 'email be a string' }),
     (0, class_validator_1.MinLength)(8, { message: 'email must be at least 8 characters long' }),
-    (0, class_validator_1.MaxLength)(20, { message: 'email must npot exeed 20 characters' }),
+    (0, class_validator_1.MaxLength)(20, { message: 'email must not exceed 20 characters' }),
     (0, class_validator_1.IsEmail)({}, { message: 'please provide a valid email' }),
     __metadata("design:type", String)
 ], updateProductDto.prototype, "email", void 0);

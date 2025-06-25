@@ -16,19 +16,19 @@ routes = [
   {path: 'home', component: Homepage},
   // { path: 'products', component: ProductsComponent }, // New route
 
-  { path: 'products', component:ProductList },
-  { path: 'cart', component: Cart },
+  {path: 'products', component: ProductList},
+  {path: 'cart', component: Cart},
 
   {
     path: 'admin',
     component: Dashboard,
     children: [
-      { path: 'edit-product', component: EditProduct },
-      { path: 'add-product', component: AddProduct },
-      { path: 'product-list', component: ProductList },
-      { path: 'view-users', component: ProductList },
-      { path: '', redirectTo: 'product-list', pathMatch: 'full' }
+      {path: 'edit-product', component: EditProduct},
+      {path: 'add-product', component: AddProduct},
+      {path: 'product-list', component: ProductList},
+      {path: 'view-users', component: ProductList},
+      {path: '', redirectTo: 'product-list', pathMatch: 'full'}
     ]
   },
-  { path: '**', redirectTo: 'login' }
+  {path: '**', redirectTo: 'login'}
 ];

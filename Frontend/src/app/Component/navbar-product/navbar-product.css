@@ -1,0 +1,52 @@
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.logo h1 {
+  font-size: 32px;
+  color: #2563eb;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a, .nav-links .signup {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nav-links .signup {
+  padding: 8px 16px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.nav-links .signup:hover {
+  background-color: #1e4fd8;
+}
+
+.welcome-heading {
+  text-align: center;
+  color: #1e293b;
+  font-size: 24px;
+  line-height: 1.6;
+  margin-top: 60px;
+  margin-bottom: 40px;
+}

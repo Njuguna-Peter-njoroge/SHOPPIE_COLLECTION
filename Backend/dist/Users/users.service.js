@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var UsersService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
@@ -15,71 +16,83 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const library_1 = require("../../generated/prisma/runtime/library");
 const bcrypt = require("bcryptjs");
 const prisma_1 = require("../../generated/prisma/index.js");
-let UsersService = class UsersService {
-    Prisma;
-    remove() {
-        throw new Error('Method not implemented.');
+const mailer_1 = require("@nestjs-modules/mailer");
+let UsersService = UsersService_1 = class UsersService {
+    prisma;
+    mailerService;
+    logger = new common_1.Logger(UsersService_1.name);
+    constructor(prisma, mailerService) {
+        this.prisma = prisma;
+        this.mailerService = mailerService;
     }
-    constructor(Prisma) {
-        this.Prisma = Prisma;
+    async create(data) {
+        const hashedPassword = await bcrypt.hash(data.password, 12);
+        try {
+            const user = await this.prisma.user.create({
+                data: {
+                    name: data.name,
+                    email: data.email.toLowerCase(),
+                    password: hashedPassword,
+                    role: data.role || 'CUSTOMER',
+                    status: data.status || 'ACTIVE',
+                },
+            });
+            const userResponse = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                status: user.status,
+            };
+            try {
+                await this.mailerService.sendMail({
+                    to: user.email,
+                    subject: 'Welcome to our platform!',
+                    template: './welcome',
+                    context: {
+                        name: user.name,
+                    },
+                });
+            }
+            catch (error) {
+                this.logger.error('Failed to send welcome email:', error);
+            }
+            return {
+                success: true,
+                message: 'User created successfully',
+                data: userResponse,
+            };
+        }
+        catch (error) {
+            if (error instanceof library_1.PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') {
+                    throw new common_1.BadRequestException('Email already exists');
+                }
+                throw new common_1.BadRequestException(`Database error: ${error.message}`);
+            }
+            throw new common_1.InternalServerErrorException('An unexpected error occurred');
+        }
+    }
+    remove(id) {
+        throw new Error('Method not implemented.');
     }
     sanitizeUser(user) {
         const { password, ...rest } = user;
         return rest;
     }
-    async create(data) {
-        if (!data.password) {
-            throw new common_1.BadRequestException('password is required');
-        }
-        if (data.password.length < 8) {
-            throw new common_1.BadRequestException('password must be at least of 8 characters');
-        }
-        const hashedPassword = await bcrypt.hash(data.password, 12);
-        try {
-            const user = await this.Prisma.user.create({
-                data: {
-                    name: data.name,
-                    email: data.email,
-                    password: hashedPassword,
-                },
-            });
-            const UserResponse = {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: 'CUSTOMER',
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
-                status: data.status ?? 'ACTIVE',
-            };
-            return {
-                success: true,
-                message: 'user created successfully',
-                data: UserResponse,
-            };
-        }
-        catch (error) {
-            if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code === 'p2002') {
-                    throw new common_1.BadRequestException('email already exists');
-                }
-            }
-            {
-                throw new common_1.BadRequestException('failed to create User');
-            }
-        }
-    }
     async findAll(options = {}) {
         const { page = 1, limit = 10 } = options;
         const skip = (page - 1) * limit;
         const [users] = await Promise.all([
-            this.Prisma.user.findMany({
+            this.prisma.user.findMany({
                 where: { isActive: true },
                 skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
             }),
-            this.Prisma.user.count({ where: { isActive: true } }),
+            this.prisma.user.count({ where: { isActive: true } }),
         ]);
         return {
             success: true,
@@ -91,7 +104,7 @@ let UsersService = class UsersService {
         if (!id) {
             throw new common_1.BadRequestException('User ID is required');
         }
-        const user = await this.Prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: { id },
         });
         if (!user || !user.isActive) {
@@ -107,7 +120,7 @@ let UsersService = class UsersService {
         return this.findOne(id);
     }
     async findByEmail(email) {
-        const user = await this.Prisma.user.findUnique({
+        const user = await this.prisma.user.findUnique({
             where: { email },
         });
         if (!user || !user.isActive) {
@@ -123,7 +136,7 @@ let UsersService = class UsersService {
         if (!id) {
             throw new common_1.BadRequestException('User ID is required');
         }
-        const existingUser = await this.Prisma.user.findUnique({
+        const existingUser = await this.prisma.user.findUnique({
             where: { id },
         });
         if (!existingUser || !existingUser.isActive) {
@@ -135,7 +148,7 @@ let UsersService = class UsersService {
         if (data.email)
             updateData.email = data.email;
         try {
-            const updatedUser = await this.Prisma.user.update({
+            const updatedUser = await this.prisma.user.update({
                 where: { id },
                 data: updateData,
             });
@@ -162,13 +175,13 @@ let UsersService = class UsersService {
             throw new common_1.BadRequestException('use id is required');
         }
         try {
-            const user = await this.Prisma.user.findUnique({
+            const user = await this.prisma.user.findUnique({
                 where: { id },
             });
             if (!user) {
                 throw new common_1.NotFoundException('user not found');
             }
-            await this.Prisma.user.update({
+            await this.prisma.user.update({
                 where: { id },
                 data: { isActive: false },
             });
@@ -187,8 +200,9 @@ let UsersService = class UsersService {
     }
 };
 exports.UsersService = UsersService;
-exports.UsersService = UsersService = __decorate([
+exports.UsersService = UsersService = UsersService_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        mailer_1.MailerService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

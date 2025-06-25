@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { CreateUserDto } from './Dtos/createUserDto';
 import {
   BadRequestException,
   Body,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { CreateUserDto } from './Dtos/createUserDto';
 import { UserResponseDto } from './Dtos/userResponse.Dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
@@ -14,6 +16,7 @@ import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library'
 import * as bcrypt from 'bcryptjs';
 import { Prisma, UserRole, type User } from 'generated/prisma';
 import { updateUserDto } from './Dtos/updateUserDto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 interface PaginationOptions {
   page?: number;
@@ -22,62 +25,73 @@ interface PaginationOptions {
 
 @Injectable()
 export class UsersService {
-  remove(
-    // id: string,
-  ):
-    | ApiResponse<{ message: string }>
-    | PromiseLike<ApiResponse<{ message: string }>> {
+  private readonly logger = new Logger(UsersService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private mailerService: MailerService,
+  ) {}
+
+  async create(data: CreateUserDto): Promise<ApiResponse<UserResponseDto>> {
+    const hashedPassword = await bcrypt.hash(data.password, 12);
+
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          name: data.name,
+          email: data.email.toLowerCase(),
+          password: hashedPassword,
+          role: data.role || 'CUSTOMER',
+          status: data.status || 'ACTIVE',
+        },
+      });
+
+      const userResponse: UserResponseDto = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        status: user.status,
+      };
+
+      try {
+        await this.mailerService.sendMail({
+          to: user.email,
+          subject: 'Welcome to our platform!',
+          template: './welcome',
+          context: {
+            name: user.name,
+          },
+        });
+      } catch (error) {
+        this.logger.error('Failed to send welcome email:', error);
+      }
+
+      return {
+        success: true,
+        message: 'User created successfully',
+        data: userResponse,
+      };
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new BadRequestException('Email already exists');
+        }
+        throw new BadRequestException(`Database error: ${error.message}`);
+      }
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+  }
+
+  remove(id: string): ApiResponse<{ message: string }> {
     throw new Error('Method not implemented.');
   }
-  constructor(private Prisma: PrismaService) {}
 
   private sanitizeUser(user: User): UserResponseDto {
     const { password, ...rest } = user;
     return rest as UserResponseDto;
-  }
-
-  async create(data: CreateUserDto): Promise<ApiResponse<UserResponseDto>> {
-    if (!data.password) {
-      throw new BadRequestException('password is required');
-    }
-    if (data.password.length < 8) {
-      throw new BadRequestException(
-        'password must be at least of 8 characters',
-      );
-    }
-    const hashedPassword = await bcrypt.hash(data.password, 12);
-    try {
-      const user = await this.Prisma.user.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          password: hashedPassword,
-        },
-      });
-      const UserResponse: UserResponseDto = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: 'CUSTOMER',
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        status: data.status ?? 'ACTIVE',
-      };
-      return {
-        success: true,
-        message: 'user created successfully',
-        data: UserResponse,
-      };
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'p2002') {
-          throw new BadRequestException('email already exists');
-        }
-      }
-      {
-        throw new BadRequestException('failed to create User');
-      }
-    }
   }
 
   // find all users
@@ -88,13 +102,13 @@ export class UsersService {
     const skip = (page - 1) * limit;
 
     const [users] = await Promise.all([
-      this.Prisma.user.findMany({
+      this.prisma.user.findMany({
         where: { isActive: true },
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      this.Prisma.user.count({ where: { isActive: true } }),
+      this.prisma.user.count({ where: { isActive: true } }),
     ]);
     return {
       success: true,
@@ -109,7 +123,7 @@ export class UsersService {
       throw new BadRequestException('User ID is required');
     }
 
-    const user = await this.Prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
     });
 
@@ -131,7 +145,7 @@ export class UsersService {
 
   // find by email
   async findByEmail(email: string): Promise<ApiResponse<UserResponseDto>> {
-    const user = await this.Prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email },
     });
 
@@ -155,7 +169,7 @@ export class UsersService {
       throw new BadRequestException('User ID is required');
     }
 
-    const existingUser = await this.Prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { id },
     });
 
@@ -181,7 +195,7 @@ export class UsersService {
     // }
 
     try {
-      const updatedUser = await this.Prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { id },
         data: updateData,
       });
@@ -214,13 +228,13 @@ export class UsersService {
       throw new BadRequestException('use id is required');
     }
     try {
-      const user = await this.Prisma.user.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: { id },
       });
       if (!user) {
         throw new NotFoundException('user not found');
       }
-      await this.Prisma.user.update({
+      await this.prisma.user.update({
         where: { id },
         data: { isActive: false },
       });

@@ -23,7 +23,7 @@ export class AuthService {
     email: string;
     password: string;
   }): Promise<ApiResponse<AuthResponse>> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: {
         email: loginDto.email,
         isActive: true,

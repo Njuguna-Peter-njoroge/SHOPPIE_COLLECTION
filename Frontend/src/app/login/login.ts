@@ -109,7 +109,6 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true;
     this.authMessage = '';
 
     if (this.isLoginMode) {

@@ -3,6 +3,7 @@ import {Navbar} from '../Component/navbar/navbar';
 
 @Component({
   selector: 'app-homepage',
+  standalone: true,
   imports: [
     Navbar
   ],

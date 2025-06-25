@@ -34,7 +34,7 @@ exports.AppModule = AppModule = __decorate([
             jwtconfig_module_1.JwtconfigModule,
             cloudinary_module_1.CloudinaryModule,
         ],
-        providers: [app_service_1.AppService, users_service_1.UsersService, auth_service_1.AuthService, cloudinary_service_1.CloudinaryService,],
+        providers: [app_service_1.AppService, users_service_1.UsersService, auth_service_1.AuthService, cloudinary_service_1.CloudinaryService],
         controllers: [auth_controller_1.AuthController, cloudinary_controller_1.CloudinaryController],
     })
 ], AppModule);

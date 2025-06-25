@@ -1,44 +1,10 @@
-// import { Injectable } from '@angular/core';
-// import {HttpClient} from '@angular/common/http';
-// import {Observable} from 'rxjs';
-//
-//
-// interface LoginRequest {
-//   email: string;
-//   password: string;
-// }
-//
-// interface RegisterRequest {
-//   name: string;
-//   email: string;
-//   password: string;
-// }
-//
-// @Injectable({
-
-
-//   providedIn: 'root'
-// })export class AuthService {
-//   private apiUrl = 'http://localhost:3000/auth/login';
-//
-//
-//   constructor(private http: HttpClient) {}
-//
-//   login(data: LoginRequest): Observable<any> {
-//     return this.http.post(`${this.apiUrl}/login`, data);
-//   }
-//
-//   register(data: RegisterRequest): Observable<any> {
-//     return this.http.post(`${this.apiUrl}/register`, data);
-//   }
-//
-// }
-
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, tap, throwError } from 'rxjs';
-import {environment} from '../../environments/environment';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
 interface LoginRequest {
   email: string;
   password: string;
@@ -50,17 +16,20 @@ interface RegisterRequest {
   password: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+}
+
 interface AuthResponse {
   success: boolean;
   message: string;
   data?: {
     token: string;
-    user: {
-      role: 'ADMIN' | 'CUSTOMER';
-      id: string;
-      name: string;
-      email: string;
-    };
+    user: User;
   };
 }
 
@@ -68,63 +37,84 @@ interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiBaseUrl}/auth`; // Use environment variable
+  private readonly BASE_URL = `${environment.apiBaseUrl}/auth`;
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public loading$ = this.loadingSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private toastr: ToastrService
+  ) { }
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        if (response.success && response.data) {
-          this.storeAuthData(response.data);
+  private register(userData: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.BASE_URL}/register`, userData);
+  }
+
+  private login(data: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.BASE_URL}/login`, data);
+  }
+
+  handleLogin(data: LoginRequest): void {
+    this.loadingSubject.next(true);
+    this.login(data).subscribe({
+      next: (res: AuthResponse) => {
+        if (!res.success || !res.data) {
+          this.toastr.error(res.message || 'Login failed');
+          this.loadingSubject.next(false);
+          return;
         }
-      }),
-      catchError(this.handleError)
-    );
+        const { token, user } = res.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', user.role);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        this.toastr.success('Login successful', 'Welcome');
+
+        if (user.role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/home']);
+        }
+        this.loadingSubject.next(false);
+      },
+      error: (err) => {
+        const errMessage = err.error?.message || 'Login failed';
+        this.toastr.error(errMessage, 'Login Error');
+        this.loadingSubject.next(false);
+      },
+    });
   }
 
-  register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  private storeAuthData(authData: AuthResponse['data']) {
-    if (!authData) return;
-
-    localStorage.setItem('token', authData.token);
-    localStorage.setItem('user', JSON.stringify(authData.user));
-  }
-
-  private handleError(error: any): Observable<never> {
-    let errorMessage = 'An unknown error occurred';
-
-    if (error.error?.message) {
-      errorMessage = error.error.message;
-    } else if (error.message) {
-      errorMessage = error.message;
-    }
-
-    console.error('AuthService error:', error);
-    return throwError(() => new Error(errorMessage));
-  }
-
-  // Utility methods
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  getUser(): { role: string } | null {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
+  handleRegister(userData: RegisterRequest): void {
+    this.loadingSubject.next(true);
+    this.register(userData).subscribe({
+      next: (res: AuthResponse) => {
+        this.toastr.success(res.message || 'Registration successful', 'Success');
+        this.loadingSubject.next(false);
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        const errorMessage = err.error?.message || 'Registration failed';
+        this.toastr.error(errorMessage, 'Registration Error');
+        this.loadingSubject.next(false);
+      },
+    });
   }
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     localStorage.removeItem('user');
+    this.router.navigate(['/login']);
+    this.toastr.success('Logged out successfully');
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getUserRole(): string | null {
+    return localStorage.getItem('role');
   }
 }

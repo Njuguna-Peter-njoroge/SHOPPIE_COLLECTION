@@ -1,0 +1,20 @@
+<!-- src/templates/email/welcome.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Welcome to <%= shoppieName %></title>
+</head>
+<body>
+<h2>Hello <%= name %>,</h2>
+<p>Welcome to <strong><%= storeName %></strong> 🎉</p>
+<p>We're excited to have you join us!</p>
+
+<p>You can now log in using the following link:</p>
+<a href="<%= loginUrl %>"><%= loginUrl %></a>
+
+<hr />
+<p>If you need help, contact us at <%= supportEmail %>.</p>
+<p>&copy; <%= currentYear %> <%= storeName %>. All rights reserved.</p>
+</body>
+</html>

@@ -5,9 +5,9 @@ Content-Type: application/json
 
 
       {
-  "name": "cecilia",
-  "email": "cecilia@gmail.com",
-  "password": "StrongPass123",
+  "name": "Maxmillin",
+  "email": "maxmillian@gmail.com",
+  "password": "max12345",
   "role": "CUSTOMER"
 }
 #### GET ALL USERS

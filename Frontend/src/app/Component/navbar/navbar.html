@@ -8,6 +8,14 @@
     <a routerLink="/products" class="nav">Products</a>
     <a routerLink="/cart" class="nav">Cart</a>
     <a routerLink="/contact" class="nav">Contact</a>
-    <button class="signup" [routerLink]="['/app-login']">Sign up</button>
+
+    <ng-container *ngIf="!authService.isLoggedIn(); else loggedIn">
+      <button class="signup" routerLink="/login">Login</button>
+      <button class="signup" routerLink="/register">Sign up</button>
+    </ng-container>
+
+    <ng-template #loggedIn>
+      <button class="signup" (click)="logout()">Logout</button>
+    </ng-template>
   </div>
 </header>

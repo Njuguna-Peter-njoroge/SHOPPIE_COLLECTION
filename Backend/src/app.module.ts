@@ -24,7 +24,7 @@ import { CloudinaryController } from './cloudinary/cloudinary.controller';
     JwtconfigModule,
     CloudinaryModule,
   ],
-  providers: [AppService, UsersService, AuthService, CloudinaryService,],
+  providers: [AppService, UsersService, AuthService, CloudinaryService],
   controllers: [AuthController, CloudinaryController],
 })
 export class AppModule {}

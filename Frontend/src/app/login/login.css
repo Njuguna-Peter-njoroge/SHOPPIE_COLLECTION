@@ -1,8 +1,9 @@
+/* login.css */
 .auth-container {
   max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
-  background: white;
+  background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -13,13 +14,14 @@
 }
 
 .auth-header h1 {
-  color: #0066cc;
+  color: #4f46e5;
   margin-bottom: 0.5rem;
 }
 
 .auth-header h2 {
+  color: #374151;
   font-size: 1.25rem;
-  color: #333;
+  font-weight: 400;
 }
 
 .form-group {
@@ -29,32 +31,47 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
+  color: #374151;
   font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
   font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .submit-btn {
   width: 100%;
   padding: 0.75rem;
-  background-color: #0066cc;
+  background-color: #4f46e5;
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s;
-  position: relative;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.submit-btn:hover {
+  background-color: #4338ca;
 }
 
 .submit-btn:disabled {
-  background-color: #cccccc;
+  background-color: #a5b4fc;
   cursor: not-allowed;
 }
 
@@ -69,7 +86,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .auth-message {
@@ -80,27 +99,31 @@
 }
 
 .auth-message.success {
-  background-color: #e6f7ee;
-  color: #28a745;
+  background-color: #dcfce7;
+  color: #166534;
 }
 
-.auth-message.error {
-  background-color: #fdecea;
-  color: #dc3545;
+.auth-message:not(.success) {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;
-  color: #666;
+  color: #6b7280;
 }
 
 .toggle-btn {
   background: none;
   border: none;
-  color: #0066cc;
+  color: #4f46e5;
+  font-weight: 500;
   cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.25rem;
+}
+
+.toggle-btn:hover {
   text-decoration: underline;
-  padding: 0;
-  font-size: inherit;
 }

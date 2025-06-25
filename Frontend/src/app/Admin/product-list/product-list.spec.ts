@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AuthService } from './auth-service';
+import { ProductList } from './product-list';
 
-describe('AuthService', () => {
-  let component: AuthService;
-  let fixture: ComponentFixture<AuthService>;
+describe('ProductList', () => {
+  let component: ProductList;
+  let fixture: ComponentFixture<ProductList>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AuthService]
+      imports: [ProductList]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AuthService);
+    fixture = TestBed.createComponent(ProductList);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

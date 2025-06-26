@@ -11,9 +11,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { v4 as uuidv4 } from 'uuid';
 
 import { createProductDto } from './Dtos/createproduct.dto';
 import { updateProductDto } from './Dtos/updateproduct.dto';
@@ -21,31 +18,28 @@ import { ProductsService } from './products.service';
 import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
 import { ProductResponseDto } from './Dtos/productResponse.Dto';
 
-
-
 @Controller('products')
 export class ProductsController {
   constructor(private readonly ProductsService: ProductsService) {}
 
+  // Upload product image to Cloudinary and create product
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          const uniqueName = uuidv4() + extname(file.originalname);
-          cb(null, uniqueName);
-        },
-      }),
-    }),
-  )
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAndCreateProduct(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() productData: createProductDto,
+  ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const imageUrl = `http://localhost:3000/uploads/${file.filename}`;
-    return { imageUrl };
+
+    const result = await this.ProductsService.uploadToCloudinary(file);
+    const dataWithImageUrl: createProductDto = {
+      ...productData,
+      imageUrl: result.url,
+    };
+
+    return this.ProductsService.create(dataWithImageUrl);
   }
 
   @Post()
@@ -59,8 +53,7 @@ export class ProductsController {
       return await this.ProductsService.findAll();
     } catch (error) {
       throw new BadRequestException(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        error.message || 'error retrieving products',
+        error instanceof Error ? error.message : 'error retrieving products',
       );
     }
   }
@@ -73,8 +66,7 @@ export class ProductsController {
       return await this.ProductsService.findOne(id);
     } catch (error) {
       throw new BadRequestException(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        error.message || 'error retrieving product',
+        error instanceof Error ? error.message : 'error retrieving product',
       );
     }
   }
@@ -87,8 +79,7 @@ export class ProductsController {
       return await this.ProductsService.findByName(name);
     } catch (error) {
       throw new BadRequestException(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        error.message || 'error retrieving product',
+        error instanceof Error ? error.message : 'error retrieving product',
       );
     }
   }

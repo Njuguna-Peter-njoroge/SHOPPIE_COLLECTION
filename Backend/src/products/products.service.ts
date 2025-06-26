@@ -17,10 +17,41 @@ import {
   PrismaClientKnownRequestError,
 } from 'generated/prisma/runtime/library';
 import { updateProductDto } from './Dtos/updateproduct.dto';
+import { v2 as cloudinary } from 'cloudinary';
+import * as streamifier from 'streamifier';
 
 @Injectable()
 export class ProductsService {
   constructor(private Prisma: PrismaService) {}
+
+  async uploadToCloudinary(
+    file: Express.Multer.File,
+  ): Promise<{ url: string; public_id: string }> {
+    return new Promise((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'shoppie_products',
+        },
+        (error: unknown, result: unknown) => {
+          if (error) {
+            console.error('Cloudinary Upload Error:', error);
+            reject(new Error('Failed to upload image to Cloudinary'));
+          } else {
+            const cloudinaryResult = result as {
+              url: string;
+              public_id: string;
+            };
+            console.log('✅ Cloudinary Upload Success:', cloudinaryResult);
+            resolve(cloudinaryResult);
+          }
+        },
+      );
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+  }
 
   async create(
     data: createProductDto,

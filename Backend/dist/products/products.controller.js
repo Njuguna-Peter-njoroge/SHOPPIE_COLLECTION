@@ -15,9 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
-const multer_1 = require("multer");
-const path_1 = require("path");
-const uuid_1 = require("uuid");
 const createproduct_dto_1 = require("./Dtos/createproduct.dto");
 const updateproduct_dto_1 = require("./Dtos/updateproduct.dto");
 const products_service_1 = require("./products.service");
@@ -26,12 +23,16 @@ let ProductsController = class ProductsController {
     constructor(ProductsService) {
         this.ProductsService = ProductsService;
     }
-    uploadImage(file) {
+    async uploadAndCreateProduct(file, productData) {
         if (!file) {
             throw new common_1.BadRequestException('No file uploaded');
         }
-        const imageUrl = `http://localhost:3000/uploads/${file.filename}`;
-        return { imageUrl };
+        const result = await this.ProductsService.uploadToCloudinary(file);
+        const dataWithImageUrl = {
+            ...productData,
+            imageUrl: result.url,
+        };
+        return this.ProductsService.create(dataWithImageUrl);
     }
     async create(data) {
         return this.ProductsService.create(data);
@@ -41,7 +42,7 @@ let ProductsController = class ProductsController {
             return await this.ProductsService.findAll();
         }
         catch (error) {
-            throw new common_1.BadRequestException(error.message || 'error retrieving products');
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'error retrieving products');
         }
     }
     async findOne(id) {
@@ -49,7 +50,7 @@ let ProductsController = class ProductsController {
             return await this.ProductsService.findOne(id);
         }
         catch (error) {
-            throw new common_1.BadRequestException(error.message || 'error retrieving product');
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'error retrieving product');
         }
     }
     async findByName(name) {
@@ -57,7 +58,7 @@ let ProductsController = class ProductsController {
             return await this.ProductsService.findByName(name);
         }
         catch (error) {
-            throw new common_1.BadRequestException(error.message || 'error retrieving product');
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'error retrieving product');
         }
     }
     async update(id, updateProductDto) {
@@ -70,20 +71,13 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads',
-            filename: (req, file, cb) => {
-                const uniqueName = (0, uuid_1.v4)() + (0, path_1.extname)(file.originalname);
-                cb(null, uniqueName);
-            },
-        }),
-    })),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], ProductsController.prototype, "uploadImage", null);
+    __metadata("design:paramtypes", [Object, createproduct_dto_1.createProductDto]),
+    __metadata("design:returntype", Promise)
+], ProductsController.prototype, "uploadAndCreateProduct", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),

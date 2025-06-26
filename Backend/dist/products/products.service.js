@@ -14,10 +14,30 @@ const prisma_1 = require("../../generated/prisma/index.js");
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const library_1 = require("../../generated/prisma/runtime/library");
+const cloudinary_1 = require("cloudinary");
+const streamifier = require("streamifier");
 let ProductsService = class ProductsService {
     Prisma;
     constructor(Prisma) {
         this.Prisma = Prisma;
+    }
+    async uploadToCloudinary(file) {
+        return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary_1.v2.uploader.upload_stream({
+                folder: 'shoppie_products',
+            }, (error, result) => {
+                if (error) {
+                    console.error('Cloudinary Upload Error:', error);
+                    reject(new Error('Failed to upload image to Cloudinary'));
+                }
+                else {
+                    const cloudinaryResult = result;
+                    console.log('✅ Cloudinary Upload Success:', cloudinaryResult);
+                    resolve(cloudinaryResult);
+                }
+            });
+            streamifier.createReadStream(file.buffer).pipe(uploadStream);
+        });
     }
     async create(data) {
         if (!prisma_1.UserRole.ADMIN) {

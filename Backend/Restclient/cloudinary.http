@@ -1,29 +1,25 @@
-
-YIg69Whjw81t6tevjtKyWefes6aYG2nsMRSmBE
-
-### Set your JWT token here after login (must be admin)
-@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWNjd3lmbjYwMDAxZzk5c3l6eHd5M3F4IiwiZW1haWwiOiJqb2huc29ud0BleGFtcGxlLmNvbSIsInJvbGUiOiJDVVNUT01FUiIsImlhdCI6MTc1MDkxNDgwNSwiZXhwIjoxNzUxMDAxMjA1fQ.CHsWH8jaxdRzJ-t213BNpE2XRl58AZYaKMUggkQe5Qk
- Upload product image to Cloudinary
 POST http://localhost:3000/products/upload
-Authorization: Bearer {{adminToken}}
-Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Type: multipart/form-data; boundary=MyBoundary
 
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="image"; filename="upload.png"
-Content-Type: image/png
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="test-product.jpg"
+Content-Type: image/jpeg
 
-< /home/max/Pictures/Screenshots/upload.png
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
+< /home/peter/Dev/Shoppie_Collection/Backend/Restclient/shoppieimage
+--MyBoundary
+Content-Disposition: form-data; name="name"
 
-### Create product with uploaded image URL
-POST http://localhost:3000/products
-Authorization: Bearer {{adminToken}}
-Content-Type: application/json
+Test Product
+--MyBoundary
+Content-Disposition: form-data; name="description"
 
-{
-  "name": "Test Product with Cloudinary Image",
-  "shortDescription": "A test product with image uploaded to Cloudinary",
-  "price": 99.99,
-  "image": "https://res.cloudinary.com/dixzwawtl/image/upload/v1750902373/photo-1750823812100-2138fb9c4755_tzlqtp.jpg",
-  "stockQuantity": 15
-}
+A cool new product
+--MyBoundary
+Content-Disposition: form-data; name="price"
+
+99.99
+--MyBoundary
+Content-Disposition: form-data; name="stock"
+
+10
+--MyBoundary--

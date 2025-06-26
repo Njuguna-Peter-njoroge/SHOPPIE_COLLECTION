@@ -1,6 +1,10 @@
 {
   "dependencies": {
     "@angular/animations": "^20.0.4",
+    "cloudinary": "^2.7.0",
     "ngx-toastr": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/streamifier": "^0.1.2"
   }
 }

@@ -6,6 +6,10 @@ import { updateProductDto } from './Dtos/updateproduct.dto';
 export declare class ProductsService {
     private Prisma;
     constructor(Prisma: PrismaService);
+    uploadToCloudinary(file: Express.Multer.File): Promise<{
+        url: string;
+        public_id: string;
+    }>;
     create(data: createProductDto): Promise<ApiResponse<ProductResponseDto>>;
     findAll(): Promise<ApiResponse<ProductResponseDto>[]>;
     findOne(id: string): Promise<ApiResponse<ProductResponseDto>>;

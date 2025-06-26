@@ -3,9 +3,9 @@ POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-  "name": "heater",
-  "description": "long lasting",
-  "price": "23355.00",
+  "name": "Mitsubishi engine",
+  "description": "a car engine",
+  "price": "23355555.00",
   "stock": 11,
   "imageUrl": "https://images.unsplash.com/photo-1587620970721-b1a85e0a0e26"
 }

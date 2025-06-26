@@ -6,8 +6,8 @@ Content-Type: application/json
 
 {
   "name" : "Peter",
-  "email": "maxmillianmuiruri@gmail.com",
-  "password": "devpeter123",
+  "email": "njugunapeter@gmail.com",
+  "password": "12345678",
   "role": "ADMIN"
 }
 #### GET ALL USERS

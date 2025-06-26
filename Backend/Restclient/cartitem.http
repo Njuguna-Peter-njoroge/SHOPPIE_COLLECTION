@@ -1,9 +1,12 @@
 ### Add a product to a user's cart
-POST http://localhost:3000/cart/add
+POST http://localhost:3000/cart
 Content-Type: application/json
 
 {
-  "userId": "cmcd6nuy70000g9ibv05ifjdp",
-  "productId": "your-product-id-here",
+  "userId": "cmcdgsnz50003g99r0d0zbbmd",
+  "productId": "cmcdh2sas0000g9i6wz0zy1rg",
   "quantity": 2
 }
+
+### get goods oncart
+GET  http://localhost:3000/

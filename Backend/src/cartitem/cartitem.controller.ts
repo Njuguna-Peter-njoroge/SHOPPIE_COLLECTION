@@ -8,7 +8,7 @@ export class CartItemController {
 
   @Post('add')
   async addToCart(@Body() body: CreateCartItemDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
+
     return this.cartItemService.addToCart(
       body.userId,
       body.productId,

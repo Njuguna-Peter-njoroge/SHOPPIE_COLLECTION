@@ -30,6 +30,7 @@ __decorate([
 ], createProductDto.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], createProductDto.prototype, "description", void 0);
 __decorate([
@@ -38,7 +39,8 @@ __decorate([
     __metadata("design:type", library_1.Decimal)
 ], createProductDto.prototype, "price", void 0);
 __decorate([
-    (0, class_validator_1.IsUrl)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsUrl)({}, { message: 'imageUrl must be a valid URL' }),
     __metadata("design:type", String)
 ], createProductDto.prototype, "imageUrl", void 0);
 __decorate([

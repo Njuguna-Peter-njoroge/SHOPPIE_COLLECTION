@@ -4,11 +4,11 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 
-      {
-  "name": "Maxmillin",
-  "email": "maxmillian@gmail.com",
-  "password": "max12345",
-  "role": "CUSTOMER"
+{
+  "name" : "Peter",
+  "email": "maxmillianmuiruri@gmail.com",
+  "password": "devpeter123",
+  "role": "ADMIN"
 }
 #### GET ALL USERS
 
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 #### GET ONE USER BY ID
 
-GET http://localhost:3000/users/cmc786gy10000g94ts16haw5e
+GET http://localhost:3000/users/cmcd7ish90000g9jq7dzzikmp
 Content-Type: application/json
 
 
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 ### update user by id
 
-PATCH  http://localhost:3000/users/cmc786gy10000g94ts16haw5e
+PATCH  http://localhost:3000/users/cmcd7ish90000g9jq7dzzikmp
 Content-Type: application/json
 
 {
@@ -38,5 +38,5 @@ Content-Type: application/json
 }
 
 ### delete by id
-DELETE http://localhost:3000/users/cmc786gy10000g94ts16haw5e
+DELETE http://localhost:3000/users/cmcd7ish90000g9jq7dzzikmp
 Content-Type: application/json

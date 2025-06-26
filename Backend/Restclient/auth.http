@@ -4,8 +4,8 @@ POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
-  "name": "johnson",
-  "email": "johnson@example.com",
+  "name": "admin peter",
+  "email": "njugunahpeternjoroge@gmail.com",
   "password": "password123"
 }
 ####
@@ -13,8 +13,8 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-"email": "john2@gmail.com",
-"password": "password123"
+  "email": "njugunahpeternjoroge@gmail.com",
+  "password": "password123"
 }
 ####
 GET http://localhost:3000/protected-route

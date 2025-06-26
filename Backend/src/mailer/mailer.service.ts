@@ -1,49 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as handlebars from 'handlebars';
 
 @Injectable()
 export class MailerService {
   private transporter: nodemailer.Transporter;
 
-  constructor(private configService: ConfigService) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+  constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      host: this.configService.get('SMTP_HOST'),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      port: this.configService.get('SMTP_PORT'),
-      secure: false, // true for 465, false for other ports
+      host: this.configService.get<string>('SMTP_HOST'),
+      port: this.configService.get<number>('SMTP_PORT'),
+      secure: this.configService.get<string>('SMTP_SECURE') === 'true',
       auth: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        user: this.configService.get('SMTP_USER'),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        pass: this.configService.get('SMTP_PASSWORD'),
+        user: this.configService.get<string>('SMTP_USER'),
+        pass: this.configService.get<string>('SMTP_PASSWORD'),
       },
     });
   }
 
   async sendWelcomeEmail(email: string, name: string): Promise<void> {
-    const mailOptions = {
+    const templatePath = path.join(
+      __dirname,
+      '..',
+      'templates',
+      'email',
+      'welcome.hbs', // .hbs file
+    );
+
+    const templateSource = fs.readFileSync(templatePath, 'utf8');
+    const compiledTemplate = handlebars.compile(templateSource);
+
+    const html = compiledTemplate({
+      name,
+      storeName: 'Shoppie Collection',
+      loginUrl: 'http://localhost:4200/login',
+      supportEmail: 'njugunahpeternjoroge@gmail.com',
+      currentYear: new Date().getFullYear(),
+    });
+
+    const mailOptions: nodemailer.SendMailOptions = {
       from: `"Shoppie Collection" <${this.configService.get('SMTP_FROM')}>`,
       to: email,
       subject: 'Welcome to Shoppie Collection!',
-      html: `
-        <h1>Welcome to Shoppie Collection, ${name}!</h1>
-        <p>We're excited to have you on board.</p>
-        <p>Start exploring our collection and find your perfect items!</p>
-        <br>
-        <p>Best regards,</p>
-        <p>The Shoppie Collection Team</p>
-      `,
+      html,
     };
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      console.error('Error sending welcome email:', error);
-      throw error;
+      console.error('❌ Error sending welcome email:', error);
+      throw new Error('Failed to send welcome email');
     }
   }
 }

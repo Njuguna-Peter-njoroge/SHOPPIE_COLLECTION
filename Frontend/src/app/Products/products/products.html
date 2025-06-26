@@ -1,0 +1,30 @@
+<app-navbar></app-navbar>
+
+<div class="product-landing">
+  <h2 class="title">Our Products</h2>
+
+  <input
+    type="text"
+    [(ngModel)]="searchQuery"
+    placeholder="Search products..."
+    class="search-input"
+    aria-label="Search Products"
+  />
+
+  <div class="product-grid">
+    <div class="product-card" *ngFor="let product of filteredProducts()">
+      <img
+        [src]="product.imageUrl || 'assets/placeholder.png'"
+        [alt]="product.name || 'Product Image'"
+        class="product-image"
+      />
+
+      <h3>{{ product.name || 'Unnamed Product' }}</h3>
+      <p class="category">{{ product.category || 'Uncategorized' }}</p>
+      <p class="description">{{ product.description || 'No description available.' }}</p>
+      <p class="price">$ {{ product.price?.toFixed(2) || '0.00' }}</p>
+
+      <button (click)="addToCart(product)">Add to Cart</button>
+    </div>
+  </div>
+</div>

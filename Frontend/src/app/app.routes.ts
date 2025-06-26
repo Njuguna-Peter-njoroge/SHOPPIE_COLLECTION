@@ -4,8 +4,9 @@ import {Cart} from './cart/cart';
 import {Dashboard} from './Admin/dashboard/dashboard';
 import {EditProduct} from './Admin/edit-product/edit-product';
 import {AddProduct} from './Admin/add-product/add-product';
-import {ProductList} from './Admin/product-list/product-list';
 import {LoginComponent} from './login/login';
+import {ProductLandingComponent} from './Products/products/products';
+import {AdmindashboardComponent} from './admindashboard.component/admindashboard.component';
 
 
 export let routes: Routes;
@@ -13,10 +14,10 @@ routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
   {path: 'login', component: LoginComponent},
   {path: 'signup', component: LoginComponent},
-  {path: 'home', component: Homepage},
-  // { path: 'products', component: ProductsComponent }, // New route
+  { path: 'admin-dashboard', component: AdmindashboardComponent },
 
-  {path: 'products', component: ProductList},
+  {path: 'home', component: Homepage},
+  { path: 'products', component: ProductLandingComponent },
   {path: 'cart', component: Cart},
 
   {
@@ -25,8 +26,6 @@ routes = [
     children: [
       {path: 'edit-product', component: EditProduct},
       {path: 'add-product', component: AddProduct},
-      {path: 'product-list', component: ProductList},
-      {path: 'view-users', component: ProductList},
       {path: '', redirectTo: 'product-list', pathMatch: 'full'}
     ]
   },

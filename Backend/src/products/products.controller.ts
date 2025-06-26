@@ -1,5 +1,3 @@
-import { createProductDto } from './Dtos/createproduct.dto';
-import { ProductsService } from './products.service';
 import {
   BadRequestException,
   Body,
@@ -9,20 +7,46 @@ import {
   Param,
   Patch,
   Post,
-  // Param, Patch,
-  // Post, Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { v4 as uuidv4 } from 'uuid';
+
+import { createProductDto } from './Dtos/createproduct.dto';
+import { updateProductDto } from './Dtos/updateproduct.dto';
+import { ProductsService } from './products.service';
 import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
 import { ProductResponseDto } from './Dtos/productResponse.Dto';
-import { updateProductDto } from './Dtos/updateproduct.dto';
-// import {updateProductDto} from "./Dtos/updateproduct.dto";
-// import { updateUserDto } from '../Users/Dtos/updateUserDto';
-// /import { Product } from 'prisma-client-4a8af5df4dd264be30777db27550107de028b840b0e910b92d42efcbf82efb01';
-// import { Product } from 'prisma-client-4a8af5df4dd264be30777db27550107de028b840b0e910b92d42efcbf82efb01';
+
+
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly ProductsService: ProductsService) {}
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          const uniqueName = uuidv4() + extname(file.originalname);
+          cb(null, uniqueName);
+        },
+      }),
+    }),
+  )
+  uploadImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const imageUrl = `http://localhost:3000/uploads/${file.filename}`;
+    return { imageUrl };
+  }
 
   @Post()
   async create(@Body() data: createProductDto) {
@@ -34,10 +58,10 @@ export class ProductsController {
     try {
       return await this.ProductsService.findAll();
     } catch (error) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('error retrieving products');
+      throw new BadRequestException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        error.message || 'error retrieving products',
+      );
     }
   }
 
@@ -48,10 +72,10 @@ export class ProductsController {
     try {
       return await this.ProductsService.findOne(id);
     } catch (error) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('error retrieving products');
+      throw new BadRequestException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        error.message || 'error retrieving product',
+      );
     }
   }
 
@@ -62,12 +86,13 @@ export class ProductsController {
     try {
       return await this.ProductsService.findByName(name);
     } catch (error) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('error retrieving products');
+      throw new BadRequestException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        error.message || 'error retrieving product',
+      );
     }
   }
+
   @Patch(':id')
   async update(
     @Param('id') id: string,

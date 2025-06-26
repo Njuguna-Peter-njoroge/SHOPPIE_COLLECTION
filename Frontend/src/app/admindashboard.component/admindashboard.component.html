@@ -1,0 +1,45 @@
+<app-navbar></app-navbar>
+
+<div class="admin-dashboard">
+  <aside class="sidebar">
+    <h3>Admin Menu</h3>
+    <ul>
+      <li><a routerLink="/admin/products">Manage Products</a></li>
+      <li><a routerLink="/admin/orders">View Orders</a></li>
+      <li><a routerLink="/admin/users">User Management</a></li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+      <h2>Add New Product</h2>
+
+      <label for="name">Product Name</label>
+      <input type="text" id="name" formControlName="name" placeholder="Enter product name" />
+
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" rows="4" placeholder="Enter product description"></textarea>
+
+      <label for="price">Price</label>
+      <input type="number" id="price" formControlName="price" placeholder="Enter price in USD" />
+
+      <label for="category">Category</label>
+      <input type="text" id="category" formControlName="category" placeholder="e.g. Electronics, Books..." />
+
+      <label for="image">Upload Image</label>
+      <input type="file" id="image" (change)="onFileSelected($event)" />
+
+      <p class="uploading" *ngIf="isUploading">Uploading image...</p>
+
+      <div *ngIf="imageUrl" class="image-preview">
+        <img [src]="imageUrl" alt="Product preview" />
+      </div>
+
+      <button type="submit" [disabled]="productForm.invalid || isUploading">
+        {{ isUploading ? 'Please wait...' : 'Add Product' }}
+      </button>
+    </form>
+
+    <router-outlet></router-outlet>
+  </main>
+</div>

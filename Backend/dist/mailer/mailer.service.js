@@ -13,6 +13,9 @@ exports.MailerService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const nodemailer = require("nodemailer");
+const fs = require("fs");
+const path = require("path");
+const handlebars = require("handlebars");
 let MailerService = class MailerService {
     configService;
     transporter;
@@ -21,7 +24,7 @@ let MailerService = class MailerService {
         this.transporter = nodemailer.createTransport({
             host: this.configService.get('SMTP_HOST'),
             port: this.configService.get('SMTP_PORT'),
-            secure: false,
+            secure: this.configService.get('SMTP_SECURE') === 'true',
             auth: {
                 user: this.configService.get('SMTP_USER'),
                 pass: this.configService.get('SMTP_PASSWORD'),
@@ -29,25 +32,28 @@ let MailerService = class MailerService {
         });
     }
     async sendWelcomeEmail(email, name) {
+        const templatePath = path.join(__dirname, '..', 'templates', 'email', 'welcome.hbs');
+        const templateSource = fs.readFileSync(templatePath, 'utf8');
+        const compiledTemplate = handlebars.compile(templateSource);
+        const html = compiledTemplate({
+            name,
+            storeName: 'Shoppie Collection',
+            loginUrl: 'http://localhost:4200/login',
+            supportEmail: 'njugunahpeternjoroge@gmail.com',
+            currentYear: new Date().getFullYear(),
+        });
         const mailOptions = {
             from: `"Shoppie Collection" <${this.configService.get('SMTP_FROM')}>`,
             to: email,
             subject: 'Welcome to Shoppie Collection!',
-            html: `
-        <h1>Welcome to Shoppie Collection, ${name}!</h1>
-        <p>We're excited to have you on board.</p>
-        <p>Start exploring our collection and find your perfect items!</p>
-        <br>
-        <p>Best regards,</p>
-        <p>The Shoppie Collection Team</p>
-      `,
+            html,
         };
         try {
             await this.transporter.sendMail(mailOptions);
         }
         catch (error) {
-            console.error('Error sending welcome email:', error);
-            throw error;
+            console.error('❌ Error sending welcome email:', error);
+            throw new Error('Failed to send welcome email');
         }
     }
 };

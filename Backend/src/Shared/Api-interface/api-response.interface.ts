@@ -4,4 +4,3 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export class AuthReponse {}

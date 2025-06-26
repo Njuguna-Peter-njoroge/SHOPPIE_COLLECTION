@@ -13,10 +13,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const library_1 = require("../../generated/prisma/runtime/library");
 const bcrypt = require("bcryptjs");
-const prisma_1 = require("../../generated/prisma/index.js");
 const mailer_1 = require("@nestjs-modules/mailer");
+const library_1 = require("@prisma/client/runtime/library");
 let UsersService = UsersService_1 = class UsersService {
     prisma;
     mailerService;
@@ -24,6 +23,10 @@ let UsersService = UsersService_1 = class UsersService {
     constructor(prisma, mailerService) {
         this.prisma = prisma;
         this.mailerService = mailerService;
+    }
+    sanitizeUser(user) {
+        const { password, ...rest } = user;
+        return rest;
     }
     async create(data) {
         const hashedPassword = await bcrypt.hash(data.password, 12);
@@ -37,22 +40,17 @@ let UsersService = UsersService_1 = class UsersService {
                     status: data.status || 'ACTIVE',
                 },
             });
-            const userResponse = {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
-                status: user.status,
-            };
             try {
                 await this.mailerService.sendMail({
                     to: user.email,
-                    subject: 'Welcome to our platform!',
-                    template: './welcome',
+                    subject: 'Welcome to Shoppie Collection!',
+                    template: 'welcome',
                     context: {
                         name: user.name,
+                        storeName: 'Shoppie Collection',
+                        loginUrl: 'https://your-site.com/login',
+                        supportEmail: 'support@your-site.com',
+                        currentYear: new Date().getFullYear(),
                     },
                 });
             }
@@ -62,7 +60,7 @@ let UsersService = UsersService_1 = class UsersService {
             return {
                 success: true,
                 message: 'User created successfully',
-                data: userResponse,
+                data: this.sanitizeUser(user),
             };
         }
         catch (error) {
@@ -75,25 +73,11 @@ let UsersService = UsersService_1 = class UsersService {
             throw new common_1.InternalServerErrorException('An unexpected error occurred');
         }
     }
-    remove(id) {
-        throw new Error('Method not implemented.');
-    }
-    sanitizeUser(user) {
-        const { password, ...rest } = user;
-        return rest;
-    }
-    async findAll(options = {}) {
-        const { page = 1, limit = 10 } = options;
-        const skip = (page - 1) * limit;
-        const [users] = await Promise.all([
-            this.prisma.user.findMany({
-                where: { isActive: true },
-                skip,
-                take: limit,
-                orderBy: { createdAt: 'desc' },
-            }),
-            this.prisma.user.count({ where: { isActive: true } }),
-        ]);
+    async findAll(paginationOptions) {
+        const users = await this.prisma.user.findMany({
+            where: { isActive: true },
+            orderBy: { createdAt: 'desc' },
+        });
         return {
             success: true,
             message: 'Users retrieved successfully',
@@ -101,11 +85,23 @@ let UsersService = UsersService_1 = class UsersService {
         };
     }
     async findOne(id) {
-        if (!id) {
+        if (!id)
             throw new common_1.BadRequestException('User ID is required');
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user || !user.isActive) {
+            throw new common_1.NotFoundException('User not found');
         }
+        return {
+            success: true,
+            message: 'User retrieved successfully',
+            data: this.sanitizeUser(user),
+        };
+    }
+    async findByEmail(email) {
+        if (!email)
+            throw new common_1.BadRequestException('Email is required');
         const user = await this.prisma.user.findUnique({
-            where: { id },
+            where: { email: email.toLowerCase() },
         });
         if (!user || !user.isActive) {
             throw new common_1.NotFoundException('User not found');
@@ -116,29 +112,10 @@ let UsersService = UsersService_1 = class UsersService {
             data: this.sanitizeUser(user),
         };
     }
-    async getById(id) {
-        return this.findOne(id);
-    }
-    async findByEmail(email) {
-        const user = await this.prisma.user.findUnique({
-            where: { email },
-        });
-        if (!user || !user.isActive) {
-            throw new common_1.NotFoundException('user not found');
-        }
-        return {
-            success: true,
-            message: 'User retrieved successfully',
-            data: this.sanitizeUser(user),
-        };
-    }
     async update(id, data) {
-        if (!id) {
+        if (!id)
             throw new common_1.BadRequestException('User ID is required');
-        }
-        const existingUser = await this.prisma.user.findUnique({
-            where: { id },
-        });
+        const existingUser = await this.prisma.user.findUnique({ where: { id } });
         if (!existingUser || !existingUser.isActive) {
             throw new common_1.NotFoundException('User not found');
         }
@@ -159,7 +136,7 @@ let UsersService = UsersService_1 = class UsersService {
             };
         }
         catch (error) {
-            if (error instanceof prisma_1.Prisma.PrismaClientKnownRequestError) {
+            if (error instanceof library_1.PrismaClientKnownRequestError) {
                 if (error.code === 'P2002') {
                     throw new common_1.BadRequestException('Email already exists');
                 }
@@ -171,32 +148,20 @@ let UsersService = UsersService_1 = class UsersService {
         }
     }
     async deleteUser(id) {
-        if (!id) {
-            throw new common_1.BadRequestException('use id is required');
-        }
-        try {
-            const user = await this.prisma.user.findUnique({
-                where: { id },
-            });
-            if (!user) {
-                throw new common_1.NotFoundException('user not found');
-            }
-            await this.prisma.user.update({
-                where: { id },
-                data: { isActive: false },
-            });
-            return {
-                success: true,
-                message: 'User deactivated successfully',
-                data: { message: 'User deactivated successfully' },
-            };
-        }
-        catch (error) {
-            if (error instanceof common_1.NotFoundException) {
-                throw error;
-            }
-            throw new common_1.BadRequestException('Failed to deactivate user');
-        }
+        if (!id)
+            throw new common_1.BadRequestException('User ID is required');
+        const user = await this.prisma.user.findUnique({ where: { id } });
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        await this.prisma.user.update({
+            where: { id },
+            data: { isActive: false },
+        });
+        return {
+            success: true,
+            message: 'User deactivated successfully',
+            data: { message: 'User deactivated successfully' },
+        };
     }
 };
 exports.UsersService = UsersService;

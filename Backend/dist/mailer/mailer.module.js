@@ -7,17 +7,45 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailerModule = void 0;
-const config_1 = require("@nestjs/config");
-const mailer_1 = require("@nestjs-modules/mailer");
 const common_1 = require("@nestjs/common");
+const mailer_1 = require("@nestjs-modules/mailer");
+const config_1 = require("@nestjs/config");
+const ejs_adapter_1 = require("@nestjs-modules/mailer/dist/adapters/ejs.adapter");
+const path_1 = require("path");
 let MailerModule = class MailerModule {
 };
 exports.MailerModule = MailerModule;
 exports.MailerModule = MailerModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule],
-        providers: [mailer_1.MailerService],
-        exports: [mailer_1.MailerService],
+        imports: [
+            config_1.ConfigModule,
+            mailer_1.MailerModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => {
+                    return {
+                        transport: {
+                            service: 'gmail',
+                            auth: {
+                                user: configService.get('EMAIL_USER'),
+                                pass: configService.get('EMAIL_PASS'),
+                            },
+                        },
+                        defaults: {
+                            from: `"Shoppie Collection" <${configService.get('EMAIL_USER')}>`,
+                        },
+                        template: {
+                            dir: (0, path_1.join)(__dirname, '..', 'mail', 'templates'),
+                            adapter: new ejs_adapter_1.EjsAdapter(),
+                            options: {
+                                strict: false,
+                            },
+                        },
+                    };
+                },
+            }),
+        ],
+        exports: [mailer_1.MailerModule],
     })
 ], MailerModule);
 //# sourceMappingURL=mailer.module.js.map

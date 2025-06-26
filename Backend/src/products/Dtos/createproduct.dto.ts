@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-// import { Transform, Type } from 'class-transformer';
 import { Type } from 'class-transformer';
 import {
   IsDecimal,
@@ -18,25 +14,22 @@ import { Decimal } from 'generated/prisma/runtime/library';
 export class createProductDto {
   @IsString()
   @IsNotEmpty()
-  // @Transform(({ value }) => value.trim())
   name: string;
 
   @IsString()
-  // @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   description: string;
 
   @IsNotEmpty()
   @IsDecimal()
-  // @Transform(({ value }) => value.trim())
   price: Decimal;
 
-  @IsUrl()
-  // @Transform(({ value }) => value.trim())
+  @IsOptional()
+  @IsUrl({}, { message: 'imageUrl must be a valid URL' })
   imageUrl: string;
 
   @IsNumber()
   @Type(() => Number)
-  // @Transform(({ value }) => value.trim())
   stock: number;
 
   @IsOptional()

@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 import {Homepage} from './homepage/homepage';
-import {Cart} from './cart/cart';
 import {Dashboard} from './Admin/dashboard/dashboard';
 import {EditProduct} from './Admin/edit-product/edit-product';
 import {AddProduct} from './Admin/add-product/add-product';
 import {LoginComponent} from './login/login';
 import {ProductLandingComponent} from './Products/products/products';
 import {AdmindashboardComponent} from './admindashboard.component/admindashboard.component';
+import {CartService} from './cart/cart';
 
 
 export let routes: Routes;
@@ -18,7 +18,7 @@ routes = [
 
   {path: 'home', component: Homepage},
   { path: 'products', component: ProductLandingComponent },
-  {path: 'cart', component: Cart},
+  {path: 'cart', component: CartService},
 
   {
     path: 'admin',

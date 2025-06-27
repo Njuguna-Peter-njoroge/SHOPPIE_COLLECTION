@@ -1,4 +1,4 @@
 export declare class AddToCartDto {
-    product: string;
+    productId: string;
     quantity: number;
 }

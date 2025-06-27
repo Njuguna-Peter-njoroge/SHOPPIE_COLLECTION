@@ -15,10 +15,11 @@ export class ProductService {
     return this.http.post<Product>(this.apiUrl, product);
   }
 
-
-  getAllProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+  getAllProducts(): Observable<{ data: Product[] }> {
+    return this.http.get<{ data: Product[] }>(this.apiUrl);
   }
+
+
 
   // Optional: search by name or category
   searchProducts(query: string): Observable<Product[]> {

@@ -1,3 +1,4 @@
+// src/cart/cartitem.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApiResponseService } from 'src/Shared/api-response.products.interface';
@@ -39,15 +40,7 @@ export class CartItemService {
           include: {
             items: {
               include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                    description: true,
-                    price: true,
-                    imageUrl: true,
-                  },
-                },
+                product: true,
               },
             },
           },
@@ -64,7 +57,7 @@ export class CartItemService {
     }
   }
 
-  async addToCart(userId: string, productId: string, quantity = 1) {
+  async addToCart(userId: string, productId: string, quantity: number = 1) {
     try {
       const product = await this.prisma.product.findUnique({
         where: { id: productId },
@@ -101,7 +94,7 @@ export class CartItemService {
       } else {
         await this.prisma.cartItem.create({
           data: {
-            userId: String(userId),
+            userId,
             cartId: cart.id,
             productId,
             quantity,
@@ -109,7 +102,7 @@ export class CartItemService {
         });
       }
 
-      return this.getCart(userId); // Return updated cart
+      return this.getCart(userId); // return updated cart
     } catch (error) {
       return this.apiResponse.serverError(
         'Failed to add to cart',

@@ -44,14 +44,14 @@ export class CartService {
     }
   }
 
-  addToCart(product: Product, quantity: number = 1): Observable<any> {
+  addToCart(product: string, quantity?: { product: string; quantity: number }): Observable<any> {
     const userId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).id : null;
     if (!userId) {
       throw new Error('User not logged in');
     }
 
     const cartItem = {
-      productId: product.id!,
+      productId: product,
       quantity: quantity,
       userId: userId
     };
@@ -98,4 +98,4 @@ export class CartService {
     const cart = this.cartSubject.value;
     return cart.items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
   }
-} 
+}

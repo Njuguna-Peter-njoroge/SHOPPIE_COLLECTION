@@ -1,9 +1,9 @@
 import { CartItemService } from './cartitem.service';
-import { CreateCartItemDto } from '../products/interfaces/cartitem';
+import { AddToCartDto } from './dtos/addtocart.dto';
 export declare class CartItemController {
     private readonly cartItemService;
     constructor(cartItemService: CartItemService);
-    addToCart(body: CreateCartItemDto): Promise<{
+    addToCart(userId: string, dto: AddToCartDto): Promise<{
         success: boolean;
         message: string;
         data: any;

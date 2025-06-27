@@ -1,19 +1,24 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+// src/cart/cartitem.controller.ts
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CartItemService } from './cartitem.service';
-import { CreateCartItemDto } from '../products/interfaces/cartitem';
+import { AddToCartDto } from './dtos/addtocart.dto';
 
 @Controller('cart')
 export class CartItemController {
   constructor(private readonly cartItemService: CartItemService) {}
 
-  @Post('add')
-  async addToCart(@Body() body: CreateCartItemDto) {
-
-    return this.cartItemService.addToCart(
-      body.userId,
-      body.productId,
-      body.quantity || 1,
-    );
+  @Post('add/:userId')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async addToCart(@Param('userId') userId: string, @Body() dto: AddToCartDto) {
+    return this.cartItemService.addToCart(userId, dto.productId, dto.quantity);
   }
 
   @Get(':userId')

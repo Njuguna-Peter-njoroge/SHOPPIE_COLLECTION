@@ -49,15 +49,7 @@ let CartItemService = class CartItemService {
                     include: {
                         items: {
                             include: {
-                                product: {
-                                    select: {
-                                        id: true,
-                                        name: true,
-                                        description: true,
-                                        price: true,
-                                        imageUrl: true,
-                                    },
-                                },
+                                product: true,
                             },
                         },
                     },
@@ -103,7 +95,7 @@ let CartItemService = class CartItemService {
             else {
                 await this.prisma.cartItem.create({
                     data: {
-                        userId: String(userId),
+                        userId,
                         cartId: cart.id,
                         productId,
                         quantity,

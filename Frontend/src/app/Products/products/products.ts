@@ -27,7 +27,7 @@ export class ProductLandingComponent implements OnInit {
       imageUrl: this.placeholderImage,
     },
   ];
-  
+
   constructor(
     private productService: ProductService,
     private cartService: CartService,
@@ -42,9 +42,7 @@ export class ProductLandingComponent implements OnInit {
     this.productService.getAllProducts().subscribe({
       next: (res: any) => {
         console.log('Products response:', res);
-        // Handle the API response structure
         if (Array.isArray(res)) {
-          // Backend returns array of objects with data property
           this.products = res.map((item: any) => {
             const product = item.data;
             return {
@@ -78,15 +76,13 @@ export class ProductLandingComponent implements OnInit {
 
   addToCart(product: Product): void {
     console.log('Adding to cart:', product);
-    
-    // Check if user is logged in
+
     const user = localStorage.getItem('user');
     if (!user) {
       this.toastr.error('Please login to add items to cart', 'Login Required');
       return;
     }
 
-    // Check if product is in stock
     if (product.stock && product.stock <= 0) {
       this.toastr.error('Product is out of stock', 'Out of Stock');
       return;
@@ -112,4 +108,5 @@ export class ProductLandingComponent implements OnInit {
     // Set a fallback image when the original image fails to load
     event.target.src = this.placeholderImage;
   }
+
 }

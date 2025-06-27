@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AddToCartDto = void 0;
 const class_validator_1 = require("class-validator");
 class AddToCartDto {
-    product;
+    productId;
     quantity;
 }
 exports.AddToCartDto = AddToCartDto;
@@ -20,7 +20,7 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], AddToCartDto.prototype, "product", void 0);
+], AddToCartDto.prototype, "productId", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsNumber)(),

@@ -15,14 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartItemController = void 0;
 const common_1 = require("@nestjs/common");
 const cartitem_service_1 = require("./cartitem.service");
-const cartitem_1 = require("../products/interfaces/cartitem");
+const addtocart_dto_1 = require("./dtos/addtocart.dto");
 let CartItemController = class CartItemController {
     cartItemService;
     constructor(cartItemService) {
         this.cartItemService = cartItemService;
     }
-    async addToCart(body) {
-        return this.cartItemService.addToCart(body.userId, body.productId, body.quantity || 1);
+    async addToCart(userId, dto) {
+        return this.cartItemService.addToCart(userId, dto.productId, dto.quantity);
     }
     getCart(userId) {
         return this.cartItemService.getCart(userId);
@@ -30,10 +30,12 @@ let CartItemController = class CartItemController {
 };
 exports.CartItemController = CartItemController;
 __decorate([
-    (0, common_1.Post)('add'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.Post)('add/:userId'),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true })),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [cartitem_1.CreateCartItemDto]),
+    __metadata("design:paramtypes", [String, addtocart_dto_1.AddToCartDto]),
     __metadata("design:returntype", Promise)
 ], CartItemController.prototype, "addToCart", null);
 __decorate([

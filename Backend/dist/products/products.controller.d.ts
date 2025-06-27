@@ -6,6 +6,11 @@ import { ProductResponseDto } from './Dtos/productResponse.Dto';
 export declare class ProductsController {
     private readonly ProductsService;
     constructor(ProductsService: ProductsService);
+    uploadImage(file: Express.Multer.File): Promise<{
+        success: boolean;
+        message: string;
+        imageUrl: string;
+    }>;
     uploadAndCreateProduct(file: Express.Multer.File, productData: createProductDto): Promise<ApiResponse<ProductResponseDto>>;
     create(data: createProductDto): Promise<ApiResponse<ProductResponseDto>>;
     findAll(): Promise<ApiResponse<ProductResponseDto>[]>;

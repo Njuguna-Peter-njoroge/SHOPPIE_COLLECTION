@@ -6,6 +6,7 @@ export declare class ProductResponseDto {
     price: string;
     stock: number;
     imageUrl: string;
+    category: string;
     createdAt: Date;
     updatedAt: Date;
     status: ProductStatus;

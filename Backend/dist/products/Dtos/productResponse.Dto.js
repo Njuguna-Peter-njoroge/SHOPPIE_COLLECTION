@@ -8,6 +8,7 @@ class ProductResponseDto {
     price;
     stock;
     imageUrl;
+    category;
     createdAt;
     updatedAt;
     status;

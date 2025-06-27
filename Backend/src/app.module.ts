@@ -7,7 +7,7 @@ import { UsersModule } from './Users/users.module';
 import { UsersService } from './Users/users.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
-// import { CartItemModule } from './cartitem/cartitem.module';
+import { CartItemModule } from './cartitem/cartitem.module';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
@@ -46,7 +46,7 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     PrismaModule,
     ProductsModule,
-    // CartItemModule,
+    CartItemModule,
     AuthModule,
     JwtconfigModule,
     JwtconfigModule,

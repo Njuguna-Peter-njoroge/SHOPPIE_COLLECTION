@@ -31,6 +31,7 @@ model Product {
   price          Decimal       @db.Decimal(10, 2)
   imageUrl       String
   stock          Int
+  category       String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now())
   status         ProductStatus @default(AVAILABLE)

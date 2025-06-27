@@ -23,6 +23,27 @@ export class ProductsController {
   constructor(private readonly ProductsService: ProductsService) {}
 
   @Post('upload')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    try {
+      const result = await this.ProductsService.uploadToCloudinary(file);
+      return {
+        success: true,
+        message: 'Image uploaded successfully',
+        imageUrl: result.secure_url,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      throw new BadRequestException('Failed to upload image: ' + message);
+    }
+  }
+
+  @Post('upload-and-create')
   @UseInterceptors(FileInterceptor('file'))
   async uploadAndCreateProduct(
     @UploadedFile() file: Express.Multer.File,

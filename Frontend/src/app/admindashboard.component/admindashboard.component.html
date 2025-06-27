@@ -7,38 +7,91 @@
       <li><a routerLink="/admin/products">Manage Products</a></li>
       <li><a routerLink="/admin/orders">View Orders</a></li>
       <li><a routerLink="/admin/users">User Management</a></li>
+      <li><a (click)="viewProducts()" style="cursor: pointer;">View User Products Page</a></li>
     </ul>
   </aside>
 
   <main class="content">
-    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
-      <h2>Add New Product</h2>
+    <div class="dashboard-header">
+      <h1>Admin Dashboard</h1>
+      <p>Manage your products and view user-facing content</p>
+    </div>
 
-      <label for="name">Product Name</label>
-      <input type="text" id="name" formControlName="name" placeholder="Enter product name" />
+    <div class="dashboard-sections">
+      <!-- Add Product Section -->
+      <section class="add-product-section">
+        <h2>Add New Product</h2>
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Product Name *</label>
+              <input type="text" id="name" formControlName="name" placeholder="Enter product name" />
+            </div>
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <input type="text" id="category" formControlName="category" placeholder="e.g. Electronics, Books..." />
+            </div>
+          </div>
 
-      <label for="description">Description</label>
-      <textarea id="description" formControlName="description" rows="4" placeholder="Enter product description"></textarea>
+          <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" formControlName="description" rows="4" placeholder="Enter product description"></textarea>
+          </div>
 
-      <label for="price">Price</label>
-      <input type="number" id="price" formControlName="price" placeholder="Enter price in USD" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="price">Price (USD) *</label>
+              <input type="number" id="price" formControlName="price" placeholder="Enter price" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label for="stock">Stock Quantity *</label>
+              <input type="number" id="stock" formControlName="stock" placeholder="Enter stock quantity" min="1" />
+            </div>
+          </div>
 
-      <label for="category">Category</label>
-      <input type="text" id="category" formControlName="category" placeholder="e.g. Electronics, Books..." />
+          <div class="form-group">
+            <label for="image">Upload Product Image *</label>
+            <input type="file" id="image" (change)="onFileSelected($event)" accept="image/*" />
+            <p class="uploading" *ngIf="isUploading">Uploading image...</p>
+          </div>
 
-      <label for="image">Upload Image</label>
-      <input type="file" id="image" (change)="onFileSelected($event)" />
+          <div *ngIf="imageUrl" class="image-preview">
+            <h4>Image Preview:</h4>
+            <img [src]="imageUrl" alt="Product preview" />
+          </div>
 
-      <p class="uploading" *ngIf="isUploading">Uploading image...</p>
+          <button type="submit" [disabled]="productForm.invalid || isUploading || isSubmitting" class="submit-btn">
+            {{ isSubmitting ? 'Adding Product...' : (isUploading ? 'Please wait...' : 'Add Product') }}
+          </button>
+        </form>
+      </section>
 
-      <div *ngIf="imageUrl" class="image-preview">
-        <img [src]="imageUrl" alt="Product preview" />
-      </div>
-
-      <button type="submit" [disabled]="productForm.invalid || isUploading">
-        {{ isUploading ? 'Please wait...' : 'Add Product' }}
-      </button>
-    </form>
+      <!-- Products List Section -->
+      <section class="products-list-section">
+        <h2>Current Products</h2>
+        <div class="products-grid" *ngIf="products.length > 0; else noProducts">
+          <div class="product-card" *ngFor="let product of products">
+            <div class="product-image">
+              <img [src]="product.imageUrl" [alt]="product.name" />
+            </div>
+            <div class="product-info">
+              <h3>{{ product.name }}</h3>
+              <p class="category">{{ product.category }}</p>
+              <p class="price">${{ product.price }}</p>
+              <p class="stock">Stock: {{ product.stock }}</p>
+              <p class="description">{{ product.description }}</p>
+            </div>
+            <div class="product-actions">
+              <button (click)="editProduct(product.id)" class="edit-btn">Edit</button>
+              <button (click)="deleteProduct(product.id)" class="delete-btn">Delete</button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noProducts>
+          <p class="no-products">No products added yet. Add your first product above!</p>
+        </ng-template>
+      </section>
+    </div>
 
     <router-outlet></router-outlet>
   </main>

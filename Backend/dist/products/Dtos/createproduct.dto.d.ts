@@ -1,10 +1,10 @@
 import { ProductStatus } from 'generated/prisma';
-import { Decimal } from 'generated/prisma/runtime/library';
 export declare class createProductDto {
     name: string;
     description: string;
-    price: Decimal;
+    price: number;
     imageUrl: string;
     stock: number;
+    category: string;
     status: ProductStatus;
 }

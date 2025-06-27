@@ -13,13 +13,13 @@ exports.createProductDto = void 0;
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const prisma_1 = require("../../../generated/prisma/index.js");
-const library_1 = require("../../../generated/prisma/runtime/library");
 class createProductDto {
     name;
     description;
     price;
     imageUrl;
     stock;
+    category;
     status;
 }
 exports.createProductDto = createProductDto;
@@ -35,8 +35,9 @@ __decorate([
 ], createProductDto.prototype, "description", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsDecimal)(),
-    __metadata("design:type", library_1.Decimal)
+    (0, class_validator_1.IsNumber)(),
+    (0, class_transformer_1.Type)(() => Number),
+    __metadata("design:type", Number)
 ], createProductDto.prototype, "price", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
@@ -48,6 +49,11 @@ __decorate([
     (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
 ], createProductDto.prototype, "stock", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], createProductDto.prototype, "category", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(prisma_1.ProductStatus, {

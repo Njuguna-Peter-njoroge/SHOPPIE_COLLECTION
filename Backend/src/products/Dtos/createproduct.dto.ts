@@ -9,7 +9,6 @@ import {
   IsUrl,
 } from 'class-validator';
 import { ProductStatus } from 'generated/prisma';
-import { Decimal } from 'generated/prisma/runtime/library';
 
 export class createProductDto {
   @IsString()
@@ -21,8 +20,9 @@ export class createProductDto {
   description: string;
 
   @IsNotEmpty()
-  @IsDecimal()
-  price: Decimal;
+  @IsNumber()
+  @Type(() => Number)
+  price: number;
 
   @IsOptional()
   @IsUrl({}, { message: 'imageUrl must be a valid URL' })
@@ -31,6 +31,10 @@ export class createProductDto {
   @IsNumber()
   @Type(() => Number)
   stock: number;
+
+  @IsString()
+  @IsNotEmpty()
+  category: string;
 
   @IsOptional()
   @IsEnum(ProductStatus, {

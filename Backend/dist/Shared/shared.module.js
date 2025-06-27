@@ -6,19 +6,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CartItemModule = void 0;
+exports.SharedModule = void 0;
 const common_1 = require("@nestjs/common");
-const cartitem_service_1 = require("./cartitem.service");
-const cartitem_controller_1 = require("./cartitem.controller");
-const shared_module_1 = require("../Shared/shared.module");
-let CartItemModule = class CartItemModule {
+const api_response_products_interface_1 = require("./api-response.products.interface");
+let SharedModule = class SharedModule {
 };
-exports.CartItemModule = CartItemModule;
-exports.CartItemModule = CartItemModule = __decorate([
+exports.SharedModule = SharedModule;
+exports.SharedModule = SharedModule = __decorate([
     (0, common_1.Module)({
-        imports: [shared_module_1.SharedModule],
-        providers: [cartitem_service_1.CartItemService],
-        controllers: [cartitem_controller_1.CartItemController],
+        providers: [api_response_products_interface_1.ApiResponseService],
+        exports: [api_response_products_interface_1.ApiResponseService],
     })
-], CartItemModule);
-//# sourceMappingURL=cartitem.module.js.map
+], SharedModule);
+//# sourceMappingURL=shared.module.js.map

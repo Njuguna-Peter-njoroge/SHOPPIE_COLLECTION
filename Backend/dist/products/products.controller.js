@@ -23,22 +23,41 @@ let ProductsController = class ProductsController {
     constructor(ProductsService) {
         this.ProductsService = ProductsService;
     }
+    async uploadImage(file) {
+        if (!file) {
+            throw new common_1.BadRequestException('No file uploaded');
+        }
+        try {
+            const result = await this.ProductsService.uploadToCloudinary(file);
+            return {
+                success: true,
+                message: 'Image uploaded successfully',
+                imageUrl: result.secure_url,
+            };
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : JSON.stringify(error);
+            throw new common_1.BadRequestException('Failed to upload image: ' + message);
+        }
+    }
     async uploadAndCreateProduct(file, productData) {
         if (!file) {
             throw new common_1.BadRequestException('No file uploaded');
         }
         try {
             const result = await this.ProductsService.uploadToCloudinary(file);
+            if (!result.secure_url) {
+                throw new Error('Image upload did not return a secure_url');
+            }
             const dataWithImageUrl = {
                 ...productData,
-                imageUrl: result.secure_url || result.url,
+                imageUrl: result.secure_url,
             };
             return await this.ProductsService.create(dataWithImageUrl);
         }
         catch (error) {
-            console.error('Error creating product:', error);
-            throw new common_1.BadRequestException('Failed to create product: ' +
-                (error instanceof Error ? error.message : JSON.stringify(error)));
+            const message = error instanceof Error ? error.message : JSON.stringify(error);
+            throw new common_1.BadRequestException('Failed to create product: ' + message);
         }
     }
     async create(data) {
@@ -80,6 +99,14 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Post)('upload'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ProductsController.prototype, "uploadImage", null);
+__decorate([
+    (0, common_1.Post)('upload-and-create'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Body)()),

@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { CartItemService } from './cartitem.service';
 import { CartItemController } from './cartitem.controller';
-import {ApiResponse} from '../Shared/Api-interface/api-response.interface';
-import { ApiResponseService } from '../Shared/api-response.products.interface';
+import { SharedModule } from '../Shared/shared.module';
 
 @Module({
+  imports: [SharedModule],
   providers: [CartItemService],
-  // providers: [ApiResponseService],
-  controllers: [CartItemController], // ✅ match the import name
+  controllers: [CartItemController],
 })
-export class CartItemModule {} // ✅ optional: consider matching naming for consistency
+export class CartItemModule {}

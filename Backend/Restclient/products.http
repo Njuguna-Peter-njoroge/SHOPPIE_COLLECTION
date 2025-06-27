@@ -6,8 +6,9 @@ Content-Type: application/json
   "name": "Mitsubishi engine",
   "description": "a car engine",
   "price": "23355555.00",
+  "category": "cars deals",
   "stock": 11,
-  "imageUrl": "https://images.unsplash.com/photo-1587620970721-b1a85e0a0e26"
+  "imageUrl": "https://res.cloudinary.com/dixzwawtl/image/upload/v1750942770/shoppie_products/vphgthb2048wzm537omv.avif"
 }
 
 ### find all products

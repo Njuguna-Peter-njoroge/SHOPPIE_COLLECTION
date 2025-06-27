@@ -16,6 +16,7 @@ const users_module_1 = require("./Users/users.module");
 const users_service_1 = require("./Users/users.service");
 const prisma_module_1 = require("./prisma/prisma.module");
 const products_module_1 = require("./products/products.module");
+const cartitem_module_1 = require("./cartitem/cartitem.module");
 const auth_controller_1 = require("./auth/auth.controller");
 const auth_module_1 = require("./auth/auth.module");
 const auth_service_1 = require("./auth/auth.service");
@@ -57,6 +58,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             prisma_module_1.PrismaModule,
             products_module_1.ProductsModule,
+            cartitem_module_1.CartItemModule,
             auth_module_1.AuthModule,
             jwtconfig_module_1.JwtconfigModule,
             jwtconfig_module_1.JwtconfigModule,

@@ -30,11 +30,7 @@ let CloudinaryService = class CloudinaryService {
                 if (error || !result) {
                     return reject(error || new Error('Upload failed'));
                 }
-                resolve({
-                    url: result.url,
-                    secure_url: result.secure_url,
-                    public_id: result.public_id,
-                });
+                resolve(result);
             });
             stream_1.Readable.from(file.buffer).pipe(uploadStream);
         });

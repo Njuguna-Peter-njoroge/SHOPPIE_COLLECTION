@@ -7,7 +7,7 @@ export declare class ProductsService {
     private Prisma;
     constructor(Prisma: PrismaService);
     uploadToCloudinary(file: Express.Multer.File): Promise<{
-        url: string;
+        secure_url: string;
         public_id: string;
     }>;
     create(data: createProductDto): Promise<ApiResponse<ProductResponseDto>>;

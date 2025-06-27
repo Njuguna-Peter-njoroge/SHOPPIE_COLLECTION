@@ -70,6 +70,7 @@ export class ProductsService {
           price: new Decimal(data.price),
           stock: data.stock,
           imageUrl: data.imageUrl,
+          category: data.category,
         },
       });
 
@@ -80,6 +81,7 @@ export class ProductsService {
         price: product.price.toString(),
         stock: product.stock,
         imageUrl: product.imageUrl,
+        category: product.category,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
         status: data.status ?? 'AVAILABLE',
@@ -115,6 +117,7 @@ export class ProductsService {
           price: product.price.toString(),
           stock: product.stock,
           imageUrl: product.imageUrl,
+          category: product.category,
           createdAt: product.createdAt,
           updatedAt: product.updatedAt,
           status: product.status,
@@ -147,6 +150,7 @@ export class ProductsService {
       price: product.price.toString(),
       stock: product.stock,
       imageUrl: product.imageUrl,
+      category: product.category,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       status: product.status,
@@ -179,6 +183,7 @@ export class ProductsService {
       price: product.price.toString(),
       stock: product.stock,
       imageUrl: product.imageUrl,
+      category: product.category,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       status: product.status,
@@ -209,8 +214,9 @@ export class ProductsService {
         name: updated.name,
         description: updated.description,
         price: updated.price.toString(),
-        imageUrl: updated.imageUrl,
         stock: updated.stock,
+        imageUrl: updated.imageUrl,
+        category: updated.category,
         createdAt: updated.createdAt,
         updatedAt: updated.updatedAt,
         status: updated.status,
@@ -221,6 +227,7 @@ export class ProductsService {
         message: 'Product updated successfully',
         data: response,
       };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new BadRequestException('Failed to update product');
     }

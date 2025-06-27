@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../Services/auth-service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -81,7 +82,7 @@ import { FormsModule } from '@angular/forms';
   `,
   styleUrls: ['./login.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   isLoginMode = true;
   isLoading = false;
   authMessage = '';
@@ -90,6 +91,8 @@ export class LoginComponent {
   password = '';
   name = '';
   confirmPassword = '';
+
+  private loadingSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -101,6 +104,19 @@ export class LoginComponent {
     // Set registration mode if we're on the register route
     if (this.router.url === '/register') {
       this.isLoginMode = false;
+    }
+
+    // Subscribe to loading state
+    this.loadingSubscription = this.authService.loading$.subscribe(
+      loading => {
+        this.isLoading = loading;
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
     }
   }
 

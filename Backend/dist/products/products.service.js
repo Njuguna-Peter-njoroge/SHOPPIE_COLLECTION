@@ -23,9 +23,7 @@ let ProductsService = class ProductsService {
     }
     async uploadToCloudinary(file) {
         return new Promise((resolve, reject) => {
-            const uploadStream = cloudinary_1.v2.uploader.upload_stream({
-                folder: 'shoppie_products',
-            }, (error, result) => {
+            const uploadStream = cloudinary_1.v2.uploader.upload_stream({ folder: 'shoppie_products' }, (error, result) => {
                 if (error) {
                     console.error('Cloudinary Upload Error:', error);
                     reject(new Error('Failed to upload image to Cloudinary'));
@@ -40,8 +38,8 @@ let ProductsService = class ProductsService {
         });
     }
     async create(data) {
-        if (!prisma_1.UserRole.ADMIN) {
-            throw new common_1.ForbiddenException('only admins can create a product');
+        if (prisma_1.UserRole.ADMIN !== prisma_1.UserRole.ADMIN) {
+            throw new common_1.ForbiddenException('Only admins can create a product');
         }
         try {
             const existingProduct = await this.Prisma.product.findFirst({
@@ -50,41 +48,41 @@ let ProductsService = class ProductsService {
             if (existingProduct) {
                 throw new common_1.ConflictException('A product with this name already exists');
             }
-            const Product = await this.Prisma.product.create({
+            const product = await this.Prisma.product.create({
                 data: {
                     name: data.name,
                     description: data.description,
                     price: new library_1.Decimal(data.price),
                     stock: data.stock,
                     imageUrl: data.imageUrl,
+                    category: data.category,
                 },
             });
-            const productListResponse = {
-                id: Product.id,
-                name: Product.name,
-                description: Product.description,
-                price: Product.price.toString(),
-                stock: Product.stock,
-                imageUrl: Product.imageUrl,
-                createdAt: Product.createdAt,
-                updatedAt: Product.updatedAt,
+            const response = {
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                price: product.price.toString(),
+                stock: product.stock,
+                imageUrl: product.imageUrl,
+                category: product.category,
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt,
                 status: data.status ?? 'AVAILABLE',
             };
             return {
                 success: true,
-                message: 'product created successfully',
-                data: productListResponse,
+                message: 'Product created successfully',
+                data: response,
             };
         }
         catch (error) {
             if (error instanceof library_1.PrismaClientKnownRequestError) {
-                if (error.code === 'p2002') {
-                    throw new common_1.BadRequestException('email already exists');
+                if (error.code === 'P2002') {
+                    throw new common_1.BadRequestException('Product already exists');
                 }
             }
-            {
-                throw new common_1.BadRequestException('failed to create product');
-            }
+            throw new common_1.BadRequestException('Failed to create product');
         }
     }
     async findAll() {
@@ -100,6 +98,7 @@ let ProductsService = class ProductsService {
                     price: product.price.toString(),
                     stock: product.stock,
                     imageUrl: product.imageUrl,
+                    category: product.category,
                     createdAt: product.createdAt,
                     updatedAt: product.updatedAt,
                     status: product.status,
@@ -107,21 +106,18 @@ let ProductsService = class ProductsService {
             }));
         }
         catch (error) {
-            if (error instanceof Error) {
-                throw new common_1.BadRequestException(error.message);
-            }
-            throw new common_1.BadRequestException('Failed to fetch products');
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'Failed to fetch products');
         }
     }
     async findOne(id) {
         if (!id) {
-            throw new common_1.ForbiddenException('product id required');
+            throw new common_1.ForbiddenException('Product ID required');
         }
         const product = await this.Prisma.product.findUnique({
             where: { id },
         });
         if (!product || product.status !== 'AVAILABLE') {
-            throw new common_1.BadRequestException('product not found or not available');
+            throw new common_1.BadRequestException('Product not found or not available');
         }
         const response = {
             id: product.id,
@@ -130,25 +126,26 @@ let ProductsService = class ProductsService {
             price: product.price.toString(),
             stock: product.stock,
             imageUrl: product.imageUrl,
+            category: product.category,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
             status: product.status,
         };
         return {
             success: true,
-            message: 'product retrieved successfully',
+            message: 'Product retrieved successfully',
             data: response,
         };
     }
     async findByName(name) {
         if (!name) {
-            throw new common_1.ForbiddenException('product id required');
+            throw new common_1.ForbiddenException('Product name required');
         }
         const product = await this.Prisma.product.findFirst({
             where: { name },
         });
         if (!product || product.status !== 'AVAILABLE') {
-            throw new common_1.BadRequestException('product not found or not available');
+            throw new common_1.BadRequestException('Product not found or not available');
         }
         const response = {
             id: product.id,
@@ -157,13 +154,14 @@ let ProductsService = class ProductsService {
             price: product.price.toString(),
             stock: product.stock,
             imageUrl: product.imageUrl,
+            category: product.category,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
             status: product.status,
         };
         return {
             success: true,
-            message: 'product retrieved successfully',
+            message: 'Product retrieved successfully',
             data: response,
         };
     }
@@ -181,8 +179,9 @@ let ProductsService = class ProductsService {
                 name: updated.name,
                 description: updated.description,
                 price: updated.price.toString(),
-                imageUrl: updated.imageUrl,
                 stock: updated.stock,
+                imageUrl: updated.imageUrl,
+                category: updated.category,
                 createdAt: updated.createdAt,
                 updatedAt: updated.updatedAt,
                 status: updated.status,
@@ -208,9 +207,7 @@ let ProductsService = class ProductsService {
             throw new common_1.BadRequestException('Product not found');
         }
         try {
-            await this.Prisma.product.delete({
-                where: { id },
-            });
+            await this.Prisma.product.delete({ where: { id } });
             return {
                 success: true,
                 message: 'Product deleted successfully',
@@ -223,12 +220,6 @@ let ProductsService = class ProductsService {
     }
 };
 exports.ProductsService = ProductsService;
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ProductsService.prototype, "findAll", null);
 exports.ProductsService = ProductsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])

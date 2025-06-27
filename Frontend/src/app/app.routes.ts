@@ -11,7 +11,7 @@ import {AdmindashboardComponent} from './admindashboard.component/admindashboard
 
 export let routes: Routes;
 routes = [
-  {path: '', redirectTo: 'login', pathMatch: 'full'},
+  {path: '', redirectTo: 'home', pathMatch: 'full'},
   {path: 'login', component: LoginComponent},
   {path: 'signup', component: LoginComponent},
   { path: 'admin-dashboard', component: AdmindashboardComponent },

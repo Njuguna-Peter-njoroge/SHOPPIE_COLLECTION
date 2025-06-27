@@ -13,9 +13,17 @@ import { Navbar } from '../../Component/navbar/navbar';
   styleUrls: ['./products.css'],
 })
 export class ProductLandingComponent implements OnInit {
-  products: Product[] = [];
   searchQuery: string = '';
 
+  products = [
+    {
+      name: 'Sample Product',
+      category: 'Electronics',
+      description: 'This is a test product.',
+      price: 29.99,
+      imageUrl: 'assets/sample-product.jpg', // This image must exist in src/assets/
+    },
+  ];
   constructor(private productService: ProductService) {}
 
   ngOnInit(): void {

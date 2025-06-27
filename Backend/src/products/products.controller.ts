@@ -11,18 +11,17 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-
 import { createProductDto } from './Dtos/createproduct.dto';
 import { updateProductDto } from './Dtos/updateproduct.dto';
 import { ProductsService } from './products.service';
 import { ApiResponse } from 'src/Shared/Api-interface/api-response.interface';
 import { ProductResponseDto } from './Dtos/productResponse.Dto';
+import { UploadApiResponse } from 'cloudinary';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly ProductsService: ProductsService) {}
 
-  // Upload product image to Cloudinary and create product
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadAndCreateProduct(
@@ -33,13 +32,25 @@ export class ProductsController {
       throw new BadRequestException('No file uploaded');
     }
 
-    const result = await this.ProductsService.uploadToCloudinary(file);
-    const dataWithImageUrl: createProductDto = {
-      ...productData,
-      imageUrl: result.url,
-    };
+    try {
+      const result: UploadApiResponse =
+        await this.ProductsService.uploadToCloudinary(file);
 
-    return this.ProductsService.create(dataWithImageUrl);
+      if (!result.secure_url) {
+        throw new Error('Image upload did not return a secure_url');
+      }
+
+      const dataWithImageUrl: createProductDto = {
+        ...productData,
+        imageUrl: result.secure_url,
+      };
+
+      return await this.ProductsService.create(dataWithImageUrl);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      throw new BadRequestException('Failed to create product: ' + message);
+    }
   }
 
   @Post()
@@ -53,7 +64,7 @@ export class ProductsController {
       return await this.ProductsService.findAll();
     } catch (error) {
       throw new BadRequestException(
-        error instanceof Error ? error.message : 'error retrieving products',
+        error instanceof Error ? error.message : 'Error retrieving products',
       );
     }
   }
@@ -66,7 +77,7 @@ export class ProductsController {
       return await this.ProductsService.findOne(id);
     } catch (error) {
       throw new BadRequestException(
-        error instanceof Error ? error.message : 'error retrieving product',
+        error instanceof Error ? error.message : 'Error retrieving product',
       );
     }
   }
@@ -79,7 +90,9 @@ export class ProductsController {
       return await this.ProductsService.findByName(name);
     } catch (error) {
       throw new BadRequestException(
-        error instanceof Error ? error.message : 'error retrieving product',
+        error instanceof Error
+          ? error.message
+          : 'Error retrieving product by name',
       );
     }
   }

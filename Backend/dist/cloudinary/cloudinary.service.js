@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CloudinaryService = void 0;
 const common_1 = require("@nestjs/common");
 const cloudinary_1 = require("cloudinary");
-const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
+const stream_1 = require("stream");
 let CloudinaryService = class CloudinaryService {
     constructor() {
         cloudinary_1.v2.config({
@@ -25,42 +25,22 @@ let CloudinaryService = class CloudinaryService {
         return new Promise((resolve, reject) => {
             const uploadStream = cloudinary_1.v2.uploader.upload_stream({
                 folder: 'shoppie-products',
-                resource_type: 'auto',
+                resource_type: 'image',
             }, (error, result) => {
-                if (error) {
-                    reject(error);
+                if (error || !result) {
+                    return reject(error || new Error('Upload failed'));
                 }
-                else if (result) {
-                    resolve(result.secure_url);
-                }
-                else {
-                    reject(new Error('Upload failed'));
-                }
+                resolve({
+                    url: result.url,
+                    secure_url: result.secure_url,
+                    public_id: result.public_id,
+                });
             });
-            uploadStream.end(file.buffer);
+            stream_1.Readable.from(file.buffer).pipe(uploadStream);
         });
     }
     async deleteImage(publicId) {
-        return new Promise((resolve, reject) => {
-            cloudinary_1.v2.uploader.destroy(publicId, (error) => {
-                if (error) {
-                    reject(error);
-                }
-                else {
-                    resolve();
-                }
-            });
-        });
-    }
-    getCloudinaryStorage() {
-        return new multer_storage_cloudinary_1.CloudinaryStorage({
-            cloudinary: cloudinary_1.v2,
-            params: {
-                folder: 'shoppie-products',
-                allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                transformation: [{ width: 500, height: 500, crop: 'limit' }],
-            },
-        });
+        await cloudinary_1.v2.uploader.destroy(publicId);
     }
 };
 exports.CloudinaryService = CloudinaryService;

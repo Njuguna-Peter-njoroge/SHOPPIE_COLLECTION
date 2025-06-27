@@ -27,12 +27,19 @@ let ProductsController = class ProductsController {
         if (!file) {
             throw new common_1.BadRequestException('No file uploaded');
         }
-        const result = await this.ProductsService.uploadToCloudinary(file);
-        const dataWithImageUrl = {
-            ...productData,
-            imageUrl: result.url,
-        };
-        return this.ProductsService.create(dataWithImageUrl);
+        try {
+            const result = await this.ProductsService.uploadToCloudinary(file);
+            const dataWithImageUrl = {
+                ...productData,
+                imageUrl: result.secure_url || result.url,
+            };
+            return await this.ProductsService.create(dataWithImageUrl);
+        }
+        catch (error) {
+            console.error('Error creating product:', error);
+            throw new common_1.BadRequestException('Failed to create product: ' +
+                (error instanceof Error ? error.message : JSON.stringify(error)));
+        }
     }
     async create(data) {
         return this.ProductsService.create(data);
@@ -42,7 +49,7 @@ let ProductsController = class ProductsController {
             return await this.ProductsService.findAll();
         }
         catch (error) {
-            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'error retrieving products');
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'Error retrieving products');
         }
     }
     async findOne(id) {
@@ -50,7 +57,7 @@ let ProductsController = class ProductsController {
             return await this.ProductsService.findOne(id);
         }
         catch (error) {
-            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'error retrieving product');
+            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'Error retrieving product');
         }
     }
     async findByName(name) {
@@ -58,7 +65,9 @@ let ProductsController = class ProductsController {
             return await this.ProductsService.findByName(name);
         }
         catch (error) {
-            throw new common_1.BadRequestException(error instanceof Error ? error.message : 'error retrieving product');
+            throw new common_1.BadRequestException(error instanceof Error
+                ? error.message
+                : 'Error retrieving product by name');
         }
     }
     async update(id, updateProductDto) {

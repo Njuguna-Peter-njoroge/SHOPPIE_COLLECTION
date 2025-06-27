@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { Readable } from 'stream';
 
 @Injectable()
 export class CloudinaryService {
@@ -12,52 +12,27 @@ export class CloudinaryService {
     });
   }
 
-  async uploadImage(file: Express.Multer.File): Promise<string> {
+  async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'shoppie-products',
-          resource_type: 'auto',
+          resource_type: 'image',
         },
         (error, result) => {
-          if (error) {
-            // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-            reject(error);
-          } else if (result) {
-            resolve(result.secure_url);
-          } else {
-            reject(new Error('Upload failed'));
+          if (error || !result) {
+            return reject(error || new Error('Upload failed'));
           }
+
+          resolve(result);
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      uploadStream.end(file.buffer);
+      Readable.from(file.buffer).pipe(uploadStream);
     });
   }
 
   async deleteImage(publicId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error) => {
-        if (error) {
-          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
-  }
-
-  getCloudinaryStorage() {
-    return new CloudinaryStorage({
-      cloudinary: cloudinary,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      params: {
-        folder: 'shoppie-products',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        transformation: [{ width: 500, height: 500, crop: 'limit' }],
-      } as any,
-    });
+    await cloudinary.uploader.destroy(publicId);
   }
 }

@@ -16,6 +16,9 @@
       <h1>Admin Dashboard</h1>
       <p>Manage your products and view user-facing content</p>
     </div>
+    <div *ngIf="message" class="alert-box" [ngClass]="messageType">
+      {{ message }}
+    </div>
 
     <div class="dashboard-sections">
       <!-- Add Product Section -->

@@ -1,21 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import {Navbar} from '../Component/navbar/navbar';
-import {RouterOutlet, Router} from '@angular/router';
-import {NgIf, NgFor} from '@angular/common';
+import { RouterOutlet, Router } from '@angular/router';
+import { NgIf, NgFor, NgClass } from '@angular/common';
+import { Navbar } from '../Component/navbar/navbar';
 
 @Component({
   selector: 'app-admindashboard',
   templateUrl: './admindashboard.component.html',
-  imports: [
-    ReactiveFormsModule,
-    Navbar,
-    RouterOutlet,
-    NgIf,
-    NgFor
-  ],
-  styleUrls: ['./admindashboard.component.css']
+  styleUrls: ['./admindashboard.component.css'],
+  standalone: true,
+  imports: [ReactiveFormsModule, Navbar, RouterOutlet, NgIf, NgFor, NgClass]
 })
 export class AdmindashboardComponent implements OnInit {
   productForm!: FormGroup;
@@ -23,6 +18,9 @@ export class AdmindashboardComponent implements OnInit {
   imageUrl: string = '';
   isSubmitting = false;
   products: any[] = [];
+
+  message = '';
+  messageType: 'success' | 'error' | '' = '';
 
   constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {}
 
@@ -38,11 +36,20 @@ export class AdmindashboardComponent implements OnInit {
     this.loadProducts();
   }
 
+  showMessage(message: string, type: 'success' | 'error'): void {
+    this.message = message;
+    this.messageType = type;
+    setTimeout(() => {
+      this.message = '';
+      this.messageType = '';
+    }, 3000);
+  }
+
   loadProducts(): void {
-    this.http.get<any[]>('http://localhost:3000/products').subscribe({
-      next: (products: any) => {
-        if (Array.isArray(products)) {
-          this.products = products.map((product: any) => ({
+    this.http.get<any>('http://localhost:3000/products').subscribe({
+      next: (res: any) => {
+        if (res && Array.isArray(res.data)) {
+          this.products = res.data.map((product: any) => ({
             id: product.id,
             name: product.name,
             description: product.description,
@@ -52,21 +59,13 @@ export class AdmindashboardComponent implements OnInit {
             stock: product.stock,
             status: product.status
           }));
-        } else if (products && Array.isArray(products.data)) {
-          this.products = products.data.map((product: any) => ({
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
-            imageUrl: product.imageUrl,
-            category: product.category,
-            stock: product.stock,
-            status: product.status
-          }));
+        } else {
+          this.showMessage('Unexpected server response.', 'error');
         }
       },
       error: (err) => {
         console.error('Failed to load products:', err);
+        this.showMessage('Failed to load products.', 'error');
       }
     });
   }
@@ -84,11 +83,12 @@ export class AdmindashboardComponent implements OnInit {
       next: (res) => {
         this.imageUrl = res.imageUrl;
         this.isUploading = false;
+        this.showMessage('Image uploaded successfully.', 'success');
       },
       error: (err) => {
         console.error('Image upload failed', err);
         this.isUploading = false;
-        alert('Image upload failed. Please try again.');
+        this.showMessage('Image upload failed. Please try again.', 'error');
       }
     });
   }
@@ -96,7 +96,7 @@ export class AdmindashboardComponent implements OnInit {
   onSubmit(): void {
     if (this.productForm.invalid || !this.imageUrl) {
       if (!this.imageUrl) {
-        alert('Please upload an image first');
+        this.showMessage('Please upload an image first.', 'error');
       }
       return;
     }
@@ -105,22 +105,25 @@ export class AdmindashboardComponent implements OnInit {
 
     const productData = {
       ...this.productForm.value,
+      price: Number(this.productForm.value.price),
+      stock: Number(this.productForm.value.stock),
       imageUrl: this.imageUrl,
-      status: 'AVAILABLE'
+      status: 'AVAILABLE',
     };
 
-    this.http.post('http://localhost:3000/products', productData).subscribe({
-      next: () => {
-        alert('Product added successfully!');
+    this.http.post<any>('http://localhost:3000/products', productData).subscribe({
+      next: (res) => {
         this.productForm.reset();
         this.imageUrl = '';
         this.isSubmitting = false;
+        this.showMessage('Product added successfully.', 'success');
         this.loadProducts();
       },
       error: (err) => {
-        console.error('Product submission failed', err);
+        console.error('Product submission failed:', err);
         this.isSubmitting = false;
-        alert('Failed to add product. Please try again.');
+        const message = err?.error?.message || 'Failed to add product. Please try again.';
+        this.showMessage(message, 'error');
       }
     });
   }
@@ -134,17 +137,21 @@ export class AdmindashboardComponent implements OnInit {
   }
 
   deleteProduct(productId: string): void {
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.http.delete(`http://localhost:3000/products/${productId}`).subscribe({
-        next: () => {
-          alert('Product deleted successfully!');
-          this.loadProducts();
-        },
-        error: (err) => {
-          console.error('Failed to delete product:', err);
-          alert('Failed to delete product. Please try again.');
-        }
-      });
-    }
+    if (!confirm('Are you sure you want to delete this product?')) return;
+
+    this.http.delete(`http://localhost:3000/products/${productId}`).subscribe({
+      next: () => {
+        this.showMessage('Product deleted successfully.', 'success');
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Failed to delete product:', err);
+        this.showMessage('Failed to delete product.', 'error');
+      }
+    });
+  }
+
+  onImageError(event: Event): void {
+    (event.target as HTMLImageElement).src = 'https://via.placeholder.com/150?text=No+Image';
   }
 }

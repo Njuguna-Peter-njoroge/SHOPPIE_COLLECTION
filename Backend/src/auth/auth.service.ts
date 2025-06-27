@@ -12,11 +12,13 @@ import { AuthResponse } from './interfaces/authinterface';
 import { ApiResponse } from '../Shared/Api-interface/api-response.interface';
 import { UserResponseDto } from '../Users/Dtos/userResponse.Dto';
 import * as bcrypt from 'bcrypt';
+import { MailerService } from '../mailer/mailer.service';
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   async login(loginDto: {
@@ -110,6 +112,13 @@ export class AuthService {
           status: true,
         },
       });
+
+      // Send welcome email, but don't fail registration if it fails
+      try {
+        await this.mailerService.sendWelcomeEmail(user.email, user.name);
+      } catch (e) {
+        console.error('Failed to send welcome email:', e);
+      }
 
       return {
         success: true,

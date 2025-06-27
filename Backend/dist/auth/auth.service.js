@@ -15,12 +15,15 @@ const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../prisma/prisma.service");
 const prisma_1 = require("../../generated/prisma/index.js");
 const bcrypt = require("bcrypt");
+const mailer_service_1 = require("../mailer/mailer.service");
 let AuthService = class AuthService {
     prisma;
     jwtService;
-    constructor(prisma, jwtService) {
+    mailerService;
+    constructor(prisma, jwtService, mailerService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+        this.mailerService = mailerService;
     }
     async login(loginDto) {
         const user = await this.prisma.user.findFirst({
@@ -96,6 +99,12 @@ let AuthService = class AuthService {
                     status: true,
                 },
             });
+            try {
+                await this.mailerService.sendWelcomeEmail(user.email, user.name);
+            }
+            catch (e) {
+                console.error('Failed to send welcome email:', e);
+            }
             return {
                 success: true,
                 message: 'Registration successful. Please login to continue.',
@@ -111,6 +120,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        mailer_service_1.MailerService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

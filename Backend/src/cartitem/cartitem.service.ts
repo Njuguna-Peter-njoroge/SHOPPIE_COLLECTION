@@ -111,4 +111,21 @@ export class CartItemService {
       );
     }
   }
+
+  async removeFromCart(itemId: string) {
+    try {
+      const item = await this.prisma.cartItem.findUnique({ where: { id: itemId } });
+      if (!item) {
+        return this.apiResponse.serverError('Cart item not found', 404);
+      }
+      await this.prisma.cartItem.delete({ where: { id: itemId } });
+      return this.apiResponse.ok(null, 'Item removed from cart');
+    } catch (error) {
+      return this.apiResponse.serverError(
+        'Failed to remove item from cart',
+        500,
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
 }

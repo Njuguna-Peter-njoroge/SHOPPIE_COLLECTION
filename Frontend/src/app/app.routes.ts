@@ -6,7 +6,8 @@ import {AddProduct} from './Admin/add-product/add-product';
 import {LoginComponent} from './login/login';
 import {ProductLandingComponent} from './Products/products/products';
 import {AdmindashboardComponent} from './admindashboard.component/admindashboard.component';
-import {CartService} from './cart/cart';
+import {CartComponent} from './cart/cart';
+import { AuthGuard } from './Services/auth.guard';
 
 
 export let routes: Routes;
@@ -18,7 +19,7 @@ routes = [
 
   {path: 'home', component: Homepage},
   { path: 'products', component: ProductLandingComponent },
-  {path: 'cart', component: CartService},
+  {path: 'cart', component: CartComponent, canActivate: [AuthGuard]},
 
   {
     path: 'admin',

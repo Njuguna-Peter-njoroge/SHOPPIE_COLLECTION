@@ -23,4 +23,14 @@ export declare class CartItemController {
         message: string;
         error: string | undefined;
     }>;
+    removeFromCart(itemId: string): Promise<{
+        success: boolean;
+        message: string;
+        data: any;
+    } | {
+        success: boolean;
+        statusCode: number;
+        message: string;
+        error: string | undefined;
+    }>;
 }

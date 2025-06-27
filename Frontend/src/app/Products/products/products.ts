@@ -6,6 +6,7 @@ import { CartService } from '../../Services/cart.service';
 import { Product } from './product.model';
 import { Navbar } from '../../Component/navbar/navbar';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-landing',
@@ -31,7 +32,8 @@ export class ProductLandingComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -92,10 +94,7 @@ export class ProductLandingComponent implements OnInit {
       next: (response) => {
         console.log('Added to cart:', response);
         this.toastr.success(`${product.name} added to cart!`, 'Success');
-        // Refresh cart data
-        this.cartService.getCart().subscribe(cart => {
-          console.log('Updated cart:', cart);
-        });
+        this.router.navigate(['/cart']);
       },
       error: (err) => {
         console.error('Failed to add to cart:', err);

@@ -154,7 +154,11 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.toastr.error(this.authMessage);
         return false;
       }
-
+      if (this.password.length < 8) {
+        this.authMessage = 'Password must be at least 8 characters long';
+        this.toastr.error(this.authMessage);
+        return false;
+      }
       if (this.password !== this.confirmPassword) {
         this.authMessage = 'Passwords do not match';
         this.toastr.error(this.authMessage);

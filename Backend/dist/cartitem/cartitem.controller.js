@@ -16,6 +16,7 @@ exports.CartItemController = void 0;
 const common_1 = require("@nestjs/common");
 const cartitem_service_1 = require("./cartitem.service");
 const addtocart_dto_1 = require("./dtos/addtocart.dto");
+const passport_1 = require("@nestjs/passport");
 let CartItemController = class CartItemController {
     cartItemService;
     constructor(cartItemService) {
@@ -26,6 +27,9 @@ let CartItemController = class CartItemController {
     }
     getCart(userId) {
         return this.cartItemService.getCart(userId);
+    }
+    async removeFromCart(itemId) {
+        return this.cartItemService.removeFromCart(itemId);
     }
 };
 exports.CartItemController = CartItemController;
@@ -45,8 +49,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], CartItemController.prototype, "getCart", null);
+__decorate([
+    (0, common_1.Delete)('items/:itemId'),
+    __param(0, (0, common_1.Param)('itemId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CartItemController.prototype, "removeFromCart", null);
 exports.CartItemController = CartItemController = __decorate([
     (0, common_1.Controller)('cart'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     __metadata("design:paramtypes", [cartitem_service_1.CartItemService])
 ], CartItemController);
 //# sourceMappingURL=cartitem.controller.js.map

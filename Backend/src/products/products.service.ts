@@ -1,12 +1,9 @@
-// import { Product, ProductStatus } from './../../generated/prisma/index.d';
-
 import { createProductDto } from './Dtos/createproduct.dto';
 import { UserRole } from 'generated/prisma';
 import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
-  Get,
   Injectable,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -26,20 +23,17 @@ export class ProductsService {
 
   async uploadToCloudinary(
     file: Express.Multer.File,
-  ): Promise<{ url: string; public_id: string }> {
+  ): Promise<{ secure_url: string; public_id: string }> {
     return new Promise((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'shoppie_products',
-        },
-        (error: unknown, result: unknown) => {
+        { folder: 'shoppie_products' },
+        (error, result) => {
           if (error) {
             console.error('Cloudinary Upload Error:', error);
             reject(new Error('Failed to upload image to Cloudinary'));
           } else {
             const cloudinaryResult = result as {
-              url: string;
+              secure_url: string;
               public_id: string;
             };
             console.log('✅ Cloudinary Upload Success:', cloudinaryResult);
@@ -48,7 +42,6 @@ export class ProductsService {
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
     });
   }
@@ -56,18 +49,21 @@ export class ProductsService {
   async create(
     data: createProductDto,
   ): Promise<ApiResponse<ProductResponseDto>> {
-    if (!UserRole.ADMIN) {
-      throw new ForbiddenException('only admins can create a product');
+    // Simulated admin check (replace with real role check in actual app context)
+    if (UserRole.ADMIN !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can create a product');
     }
 
     try {
       const existingProduct = await this.Prisma.product.findFirst({
         where: { name: data.name },
       });
+
       if (existingProduct) {
         throw new ConflictException('A product with this name already exists');
       }
-      const Product = await this.Prisma.product.create({
+
+      const product = await this.Prisma.product.create({
         data: {
           name: data.name,
           description: data.description,
@@ -76,36 +72,35 @@ export class ProductsService {
           imageUrl: data.imageUrl,
         },
       });
-      const productListResponse: ProductResponseDto = {
-        id: Product.id,
-        name: Product.name,
-        description: Product.description,
-        price: Product.price.toString(),
-        stock: Product.stock,
-        imageUrl: Product.imageUrl,
-        createdAt: Product.createdAt,
-        updatedAt: Product.updatedAt,
+
+      const response: ProductResponseDto = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price.toString(),
+        stock: product.stock,
+        imageUrl: product.imageUrl,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
         status: data.status ?? 'AVAILABLE',
       };
 
       return {
         success: true,
-        message: 'product created successfully',
-        data: productListResponse,
+        message: 'Product created successfully',
+        data: response,
       };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'p2002') {
-          throw new BadRequestException('email already exists');
+        if (error.code === 'P2002') {
+          throw new BadRequestException('Product already exists');
         }
       }
-      {
-        throw new BadRequestException('failed to create product');
-      }
+
+      throw new BadRequestException('Failed to create product');
     }
   }
 
-  @Get()
   async findAll(): Promise<ApiResponse<ProductResponseDto>[]> {
     try {
       const products = await this.Prisma.product.findMany();
@@ -126,35 +121,25 @@ export class ProductsService {
         },
       }));
     } catch (error) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('Failed to fetch products');
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to fetch products',
+      );
     }
   }
 
-  // async findOne(id: string): Promise<ApiResponse<ProductResponseDto>> {
-  //   try{
-  //     const product = await this.Prisma.product.findUnique({
-  //       where: { id: id },
-  //     });
-  //     if (!product) {
-  //       throw new BadRequestException('Product not found');
-  //     }
-  //     return this.Prisma.product
-  //   }
-  //
-  // }
   async findOne(id: string): Promise<ApiResponse<ProductResponseDto>> {
     if (!id) {
-      throw new ForbiddenException('product id required');
+      throw new ForbiddenException('Product ID required');
     }
+
     const product = await this.Prisma.product.findUnique({
       where: { id },
     });
+
     if (!product || product.status !== 'AVAILABLE') {
-      throw new BadRequestException('product not found or not available');
+      throw new BadRequestException('Product not found or not available');
     }
+
     const response: ProductResponseDto = {
       id: product.id,
       name: product.name,
@@ -166,23 +151,27 @@ export class ProductsService {
       updatedAt: product.updatedAt,
       status: product.status,
     };
+
     return {
       success: true,
-      message: 'product retrieved successfully',
+      message: 'Product retrieved successfully',
       data: response,
     };
   }
 
   async findByName(name: string): Promise<ApiResponse<ProductResponseDto>> {
     if (!name) {
-      throw new ForbiddenException('product id required');
+      throw new ForbiddenException('Product name required');
     }
+
     const product = await this.Prisma.product.findFirst({
       where: { name },
     });
+
     if (!product || product.status !== 'AVAILABLE') {
-      throw new BadRequestException('product not found or not available');
+      throw new BadRequestException('Product not found or not available');
     }
+
     const response: ProductResponseDto = {
       id: product.id,
       name: product.name,
@@ -194,9 +183,10 @@ export class ProductsService {
       updatedAt: product.updatedAt,
       status: product.status,
     };
+
     return {
       success: true,
-      message: 'product retrieved successfully',
+      message: 'Product retrieved successfully',
       data: response,
     };
   }
@@ -231,7 +221,6 @@ export class ProductsService {
         message: 'Product updated successfully',
         data: response,
       };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new BadRequestException('Failed to update product');
     }
@@ -251,16 +240,13 @@ export class ProductsService {
     }
 
     try {
-      await this.Prisma.product.delete({
-        where: { id },
-      });
+      await this.Prisma.product.delete({ where: { id } });
 
       return {
         success: true,
         message: 'Product deleted successfully',
         data: { message: 'Product deleted successfully' },
       };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new BadRequestException('Failed to delete product');
     }

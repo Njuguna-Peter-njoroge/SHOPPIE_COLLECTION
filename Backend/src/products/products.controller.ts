@@ -33,7 +33,8 @@ export class ProductsController {
     }
 
     try {
-      const result: UploadApiResponse =
+      // Use Partial<UploadApiResponse> to prevent TS2740 error
+      const result: Partial<UploadApiResponse> =
         await this.ProductsService.uploadToCloudinary(file);
 
       if (!result.secure_url) {
